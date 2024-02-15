@@ -1,4 +1,5 @@
 <template>
+	<h1>liste des clients</h1>
 	<template v-for="(user) in users" :key="user.id">
 		<p v-text="user.name"/>
 	</template>

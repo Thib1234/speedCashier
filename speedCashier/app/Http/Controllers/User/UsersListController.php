@@ -12,6 +12,6 @@ class UsersListController extends Controller
      */
     public function __invoke(Request $request)
     {
-        return view('users.index');
+        // return view('users.index');
     }
 }

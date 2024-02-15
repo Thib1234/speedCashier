@@ -8,14 +8,14 @@
 </head>
 
 <body>
-    <h1 class="text-3xl font-bold underline">
-        Speed Cashier
-    </h1>
     <div id="app">
+
+        <heading></heading>
         @yield('content')
         
     </div>
 </body>
+
 @vite('resources/js/app.js')
 
 </html>

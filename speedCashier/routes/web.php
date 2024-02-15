@@ -14,5 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-Route::get('/', \App\Http\Controllers\User\UsersListController::class)->name('users');
+Route::view('/', 'app')->name('index');
 Route::view('/users/create', 'users.create')->name('users.create');
+Route::view('/users/index', 'users.index')->name('users.index');
+Route::view('/cashier', 'cashier')->name('cashier');

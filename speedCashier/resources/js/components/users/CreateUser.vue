@@ -1,5 +1,4 @@
 <template>
-    
     <form>
 		
         <div class="space-y-12 p-20">
@@ -47,9 +46,11 @@
         </div>
 
     </form>
+
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 
 const formData = ref({
 	name:'',

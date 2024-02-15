@@ -20,3 +20,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('users', \App\Http\Controllers\Api\User\IndexController::class)->name('index');
 route::post('users', \App\Http\Controllers\Api\User\StoreController::class)->name('store');
+
+route::get('products', \App\Http\Controllers\Api\Product\IndexController::class)->name('products.index');
