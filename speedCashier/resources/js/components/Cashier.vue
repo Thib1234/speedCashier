@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col items-center">
-        <h1 class="text-3xl font-bold mb-6">Caisse</h1>
-        <div class="w-full max-w-3xl">
+        <h1 class="text-3xl font-bold mb-2">Caisse</h1>
+        <div class="w-full max-w-8xl">
             <div class="flex items-center justify-between bg-gray-100 p-6 mb-6 rounded-lg">
                 <input v-model="searchQuery" type="text" placeholder="Rechercher un produit"
                     class="w-full mr-4 py-3 px-6 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg">
@@ -9,11 +9,12 @@
                     class="py-3 px-6 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none text-lg">Effacer</button>
             </div>
             <div v-if="filteredProducts.length === 0" class="text-gray-500 text-center mb-8">Aucun produit trouvé.</div>
-            <div v-else class="grid grid-cols-2 gap-6">
-                <div v-for="product in filteredProducts" :key="product.id" @click="addToCart(product)"
+            <div v-else class="grid grid-cols-6 gap-6">
+                <div v-for="product in filteredProducts" :key="product.id" @click="addToCart(product), searchQuery = ''"
                     class="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition duration-300 ease-in-out">
                     <h2 class="text-xl font-bold mb-2">{{ product.name }}</h2>
                     <p class="text-gray-700 text-lg">{{ product.price }} €</p>
+                    <p class="text-gray-700 text-xs">stock : {{ product.stock }}</p>
                 </div>
             </div>
         </div>
@@ -25,6 +26,8 @@
                     class="flex justify-between items-center bg-gray-100 p-6 mb-4 rounded-lg">
                     <div class="text-lg">{{ item.product.name }}</div>
                     <div class="text-lg">{{ item.product.price }} €</div>
+                    <div class="text-xs">stock : {{ item.product.stock }}</div>
+
                     <div class="flex items-center">
                         <button @click="removeFromCart(index)"
                             class="text-red-500 font-bold focus:outline-none text-lg">-</button>
@@ -32,10 +35,16 @@
                         <button @click="addToCart(item.product)"
                             class="text-green-500 font-bold focus:outline-none text-lg">+</button>
                     </div>
+                    <div class="text-lg">
+                        <!-- {{ cartMultiplication(item.price, item.quantity) }} -->
+                        <!-- {{  item.price * item.quantity}} -->
+                    </div>
                 </div>
                 <div class="text-2xl font-bold text-right">Total: {{ totalAmount }} €</div>                
-                <button @click="checkout"
+                <button v-if="changeDue === 0" @click="checkout"
                     class="w-full bg-blue-500 text-white py-4 rounded-lg mt-8 hover:bg-blue-600 focus:outline-none text-xl">Payer</button>
+                    <button @click="resetCart"
+                    class="w-full bg-red-500 text-white py-4 rounded-lg mt-8 hover:bg-red-600 focus:outline-none text-xl">Annuler la vente</button>
             </div>
         </div>
     </div>
@@ -87,6 +96,7 @@
         <span v-if="changeDue > 0" class="ml-4 text-blue-500">Montant à rendre: {{ changeDue }} €</span>
         <span v-if="changeDue < 0" class="ml-4 text-red-500">Reste à payer: {{ Math.abs(changeDue) }} €</span>
         <span v-if="changeDue === 0" class="ml-4 text-green-500">Compte juste</span>
+        <button @click="addtotal">{{ Math.abs(changeDue) }}</button>
     </div>
 </template>
 <script setup>
@@ -109,6 +119,9 @@
     const amountPaidBancontact = ref(0);
     const amountPaidCreditcard = ref(0);
 
+    const addtotal = () => {
+        amountPaidCash.value = Math.abs(changeDue.value)
+    }
     const totalAmount = computed(() => {
         return cart.value.reduce((total, item) => total + (item.product.price * item.quantity), 0);
     });
@@ -116,7 +129,9 @@
     const changeDue = computed(() => {
         return (amountPaidCash.value + amountPaidBancontact.value + amountPaidCreditcard.value) - totalAmount.value;
     });
-
+    const cartMultiplication = computed((a, b) => {
+        return a * b;
+    })
     const loadFromServer = async () => {
         await axios.get('/api/products')
             .then((res) => products.value = res.data.data)
@@ -157,32 +172,25 @@
         // Logique de paiement
         console.log('Paiement effectué');
         // Réinitialiser le panier après le paiement
-        cart.value = [];
+        resetCart();
     };
 
     const selectPaymentMethod = (method) => {
         paymentMethod.value = method;
     };
 
-    // LOGIQUE DE PAIEMENT
-    const processPayment = () => {
-        if (paymentMethod.value === 'cash') {
-            if (amountPaid.value < totalAmount.value) {
-                alert('Le montant payé est insuffisant.');
-            } else if (amountPaid.value > totalAmount.value) {
-                alert(`Montant à rendre: ${changeDue.value} €`);
-            } else {
-                alert('Paiement en espèces effectué.');
-            }
-        } else if (paymentMethod.value === 'bancontact') {
-            alert('Paiement Bancontact effectué.');
-        } else if (paymentMethod.value === 'credit_card') {
-            alert('Paiement par carte de crédit effectué.');
-        }
-    };
     watchEffect(() => {
         updateFilteredProducts();
     });
+
+    const resetCart = () => {
+        cart.value = []
+        totalAmount.value = 0
+        changeDue.value = 0
+        amountPaidCash.value = 0
+        amountPaidBancontact.value = 0
+        amountPaidCreditcard.value = 0
+    }
 
 </script>
 

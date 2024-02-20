@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::view('/', 'app')->name('index');
-Route::view('/users/create', 'users.create')->name('users.create');
-Route::view('/users/index', 'users.index')->name('users.index');
+Route::view('/clients/create', 'clients.create')->name('users.create');
+Route::view('/clients/index', 'clients.index')->name('users.index');
+Route::view('/products/index', 'products.index')->name('products.index');
+Route::view('/products/create', 'products.create')->name('products.create');
+
 Route::view('/cashier', 'cashier')->name('cashier');

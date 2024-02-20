@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Api\Product;
+namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Product;
+use App\Models\Client;
 use Illuminate\Http\JsonResponse;
 
 class StoreController extends Controller
@@ -17,15 +17,13 @@ class StoreController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string',
-            'price' => 'required|integer',
-            'stock' => 'required|integer',
         ]);
 
-        $product = Product::create($validated);
+        $client = Client::create($validated);
 
         return response()->json([
             'success' => true,
-            'product' => $product,
+            'client' => $client,
         ]);
     }
 }

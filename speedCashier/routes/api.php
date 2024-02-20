@@ -18,7 +18,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('users', \App\Http\Controllers\Api\User\IndexController::class)->name('index');
-route::post('users', \App\Http\Controllers\Api\User\StoreController::class)->name('store');
+Route::get('users', \App\Http\Controllers\Api\User\IndexController::class)->name('users.index');
+route::post('users', \App\Http\Controllers\Api\User\StoreController::class)->name('users.store');
 
 route::get('products', \App\Http\Controllers\Api\Product\IndexController::class)->name('products.index');
+route::post('products', \App\Http\Controllers\Api\Product\StoreController::class)->name('products.store');
+
+route::get('clients', \App\Http\Controllers\Api\Client\IndexController::class)->name('clients.index');
+route::post('clients', \App\Http\Controllers\Api\Client\StoreController::class)->name('clients.store');

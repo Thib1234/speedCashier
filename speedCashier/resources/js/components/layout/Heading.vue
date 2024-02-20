@@ -1,6 +1,6 @@
 <template>
     <header class="bg-white">
-        <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+        <nav class="mx-auto flex max-w-2xl items-center justify-between p-6 lg:px-8" aria-label="Global">
             <div class="flex lg:flex-1">
                 <a href="/cashier" class="-m-1.5 p-1.5">
                     <h1>Speed Cashier</h1>
@@ -71,16 +71,12 @@
                                             {{ item.name }}
                                             <span class="absolute inset-0" />
                                         </a>
-                                        
                                     </div>
                                 </div>
                             </div>
                         </PopoverPanel>
                     </transition>
                 </Popover>
-                <a href="#" class="text-sm font-semibold leading-6 text-gray-900">Features</a>
-                <a href="#" class="text-sm font-semibold leading-6 text-gray-900">Marketplace</a>
-                <a href="#" class="text-sm font-semibold leading-6 text-gray-900">Company</a>
             </PopoverGroup>
         </nav>
         <Dialog as="div" class="lg:hidden" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
@@ -156,26 +152,26 @@
     const products = [{
             name: 'Ajouter un produit',
             description: '',
-            href: '#',
+            href: '/products/create',
             icon: PencilSquareIcon
         },
         {
             name: 'Afficher la liste des produits',
             description: '',
-            href: '#',
+            href: '/products/index',
             icon: ShoppingBagIcon
         },
     ]
     const clients = [{
             name: 'Ajouter un client',
             description: '',
-            href: '/users/create',
+            href: '/clients/create',
             icon: PencilSquareIcon
         },
         {
             name: 'Afficher les clients',
             description: '',
-            href: '/users/index',
+            href: '/clients/index',
             icon: IdentificationIcon
         }
     ]
