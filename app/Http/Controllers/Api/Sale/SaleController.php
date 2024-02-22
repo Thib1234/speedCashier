@@ -33,18 +33,26 @@ class SaleController extends Controller
         // Enregistrer les produits vendus
         foreach ($request->input('products') as $product) {
             $productSale = new ProductSale(); // Créez une instance de ProductSale
+            $prod = Product::find($product['id']);
+            $prod->stock = $prod->stock - $product['quantity'];
+            
             $productSale->sale_id = $sale->id;
             $productSale->product_id = $product['id'];
             $productSale->quantity = $product['quantity'];
+            
             $productSale->price = $product['price']; // Ajoutez le prix du produit
             $productSale->save();
+            $prod->save();
         }
     
         // Enregistrer le paiement de la vente
         $payment = new Payment();
         $payment->sale_id = $sale->id;
-        $payment->method = $request->input('payment_method');
+        // $payment->method = $request->input('payment_method');
         $payment->total_amount = $request->input('total_amount');
+        $payment->cash = $request->input('cash');
+        $payment->bancontact = $request->input('bancontact');
+        $payment->credit_card = $request->input('credit_card');
         $payment->save();
     
         // Réponse de succès

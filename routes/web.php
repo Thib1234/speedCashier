@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,5 +20,9 @@ Route::view('/clients/create', 'clients.create')->name('users.create');
 Route::view('/clients/index', 'clients.index')->name('users.index');
 Route::view('/products/index', 'products.index')->name('products.index');
 Route::view('/products/create', 'products.create')->name('products.create');
+
+
+
+Route::get('/register', [RegisterController::class, 'create']);
 
 Route::view('/cashier', 'cashier')->name('cashier');

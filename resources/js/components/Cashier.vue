@@ -18,13 +18,10 @@
                 </div>
             </div>
         </div>
-        <div class="w-full max-w-3xl">
-            <h2 class="text-2xl font-bold mb-4">Panier</h2>
+        <div class="w-full max-w-3xl mt-10">
+            <h2 class="text-2xl font-bold mb-4 text-center">Panier</h2>
             <div v-if="cart.length === 0" class="text-gray-500 text-center mb-4">Le panier est vide.</div>
             <div v-else>
-                <!-- Ajoutez un champ pour saisir payment_id dans votre interface utilisateur -->
-
-
                 <div v-for="(item, index) in cart" :key="index"
                     class="flex justify-between items-center bg-gray-100 p-6 mb-4 rounded-lg">
                     <div class="text-lg">{{ item.product.name }}</div>
@@ -99,6 +96,41 @@
         <span v-if="changeDue === 0" class="ml-4 text-green-500">Compte juste</span>
         <button @click="addtotal">{{ Math.abs(changeDue) }}</button>
     </div>
+    <div>
+        <!-- Bouton pour afficher la pop-up -->
+        <button @click="showPopup = true" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+            Sélectionner un client
+        </button>
+
+        <!-- Pop-up pour sélectionner les clients -->
+        <div v-if="showPopup" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+            <div class="bg-white p-8 max-w-md mx-auto rounded shadow-lg">
+                <h2 class="text-lg font-bold mb-4">Sélectionner un client</h2>
+                <div class="w-full max-w-8xl">
+                    <div class="flex items-center justify-between bg-gray-100 p-6 mb-6 rounded-lg">
+                        <input v-model="searchQueryClient" type="text" placeholder="Rechercher un client"
+                            class="w-full mr-4 py-3 px-6 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg">
+                        <button @click="searchQueryClient = ''"
+                            class="py-3 px-6 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none text-lg">Effacer</button>
+                    </div>
+                    <div v-if="filteredClients.length === 0" class="text-gray-500 text-center mb-8">Aucun client
+                        trouvé.</div>
+                    <div v-else class="grid grid-cols-2 gap-6">
+                        <div v-for="client in filteredClients" :key="client.id"
+                            @click="addClient(client), showPopup = false"
+                            class="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition duration-300 ease-in-out">
+                            <h2 class="text-xl font-bold mb-2">{{ client.name }}</h2>
+                            <h4>{{ client.id }}</h4>
+                        </div>
+                    </div>
+                </div>
+                <button @click="showPopup = false"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mt-10">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
 </template>
 <script setup>
     import {
@@ -112,23 +144,40 @@
     } from '@heroicons/vue/24/outline'
     const payment_id = ref(null);
     const products = ref({})
+    const clients = ref({})
+    const client_id = ref(null);
     const searchQuery = ref('');
+    const searchQueryClient = ref('');
     const cart = ref([]);
     const paymentMethod = ref('cash'); // Déclaration de la propriété paymentMethods
     const amountPaidCash = ref(0);
     const amountPaidBancontact = ref(0);
     const amountPaidCreditcard = ref(0);
+    const showPopup = ref(false);
+    const filteredProducts = ref([]);
+    const filteredClients = ref([]);
     const loadFromServer = async () => {
         await axios.get('/api/products')
             .then((res) => products.value = res.data.data)
             .catch((e) => console.log(e))
+        await axios.get('/api/clients')
+			.then((res) => clients.value = res.data.data)
+			.catch((e) => console.log(e))
     }
+    //charge la liste des produits et des clients
     loadFromServer();
 
-
     const addtotal = () => {
-        amountPaidCash.value = Math.abs(changeDue.value)
-    }
+        // Vérifier le mode de paiement actif
+        if (paymentMethod.value === 'cash') {
+            amountPaidCash.value = Math.abs(changeDue.value);
+        } else if (paymentMethod.value === 'bancontact') {
+            amountPaidBancontact.value = Math.abs(changeDue.value);
+        } else if (paymentMethod.value === 'credit_card') {
+            amountPaidCreditcard.value = Math.abs(changeDue.value);
+        }
+    };
+
     const totalAmount = computed(() => {
         return cart.value.reduce((total, item) => total + (item.product.price * item.quantity), 0);
     });
@@ -136,12 +185,6 @@
     const changeDue = computed(() => {
         return (amountPaidCash.value + amountPaidBancontact.value + amountPaidCreditcard.value) - totalAmount.value;
     });
-    const cartMultiplication = computed((a, b) => {
-        return a * b;
-    })
-
-
-    const filteredProducts = ref([]);
 
     const selectpaymentMethod = (method) => {
         paymentMethod.value = method;
@@ -160,72 +203,35 @@
             product.name.toLowerCase().includes(searchQuery.value.toLowerCase()));
         filteredProducts.value = filtered;
     };
+    const updateFilteredClients = () => {
+        const filtered = Object.values(clients.value).filter(client =>
+            client.name.toLowerCase().includes(searchQueryClient.value.toLowerCase()));
+        filteredClients.value = filtered;
+    };
+    const addClient = (client) => {
+        console.log(client.id);
+        client_id.value = client.id
+    }
 
-    // const addToCart = (product) => {
-    //     const existingItem = cart.value.find(item => item.product.id === product.id);
-    //     if (existingItem) {
-    //         existingItem.quantity++;
-    //     } else {
-    //         cart.value.push({
-    //             product,
-    //             quantity: 1
-    //         });
-    //     };
-    // };
-
-    // const addToCart = (product) => {
-    //     const existingItem = cart.value.find(item => item.product.id === product.id);
-    //     if (existingItem) {
-    //         existingItem.quantity++;
-    //     } else {
-    //         console.log(product.value)
-    //         cart.value.push({
-    //             product: {
-    //                 ...product,
-    //                 price: product.price
-    //             }, // Inclure le prix du produit dans l'objet du panier
-    //             quantity: 1
-    //         });
-    //     };
-    // };
-    
-//     const addToCart = (product) => {
-//     const existingItem = cart.value.find(item => item.product.id === product.id);
-//     if (existingItem) {
-//         existingItem.quantity++;
-//     } else {
-//         if (typeof product.price !== 'undefined') {
-//             console.log(typeof product)
-//             cart.value.push({
-//                 product: { ...product }, // Inclure le produit tel quel dans le panier
-//                 quantity: 1
-//             });
-//         } else {
-//             console.log(product)
-//             console.error('Le prix du produit est indéfini.');
-//             // Vous pouvez gérer cette erreur de manière appropriée, par exemple, en affichant un message à l'utilisateur.
-//         }
-//     }
-// }
-const addToCart = (product) => {
-    const existingItem = cart.value.find(item => item.product.id === product.id);
-    if (existingItem) {
-        existingItem.quantity++;
-    } else {
-        if (typeof product.price !== 'undefined') {
-            console.log(product.price);
-            cart.value.push({
-                product: { ...product, price: product.price }, // Inclure le prix du produit dans l'objet du panier
-                quantity: 1
-            });
+    const addToCart = (product) => {
+        const existingItem = cart.value.find(item => item.product.id === product.id);
+        if (existingItem) {
+            existingItem.quantity++;
         } else {
-            console.error('Le prix du produit est indéfini.');
-            // Vous pouvez gérer cette erreur de manière appropriée, par exemple, en affichant un message à l'utilisateur.
+            if (typeof product.price !== 'undefined') {
+                cart.value.push({
+                    product: {
+                        ...product,
+                        price: product.price
+                    }, // Inclure le prix du produit dans l'objet du panier
+                    quantity: 1
+                });
+            } else {
+                console.error('Le prix du produit est indéfini.');
+                // Vous pouvez gérer cette erreur de manière appropriée, par exemple, en affichant un message à l'utilisateur.
+            }
         }
     }
-}
-
-
 
     const removeFromCart = (index) => {
         const item = cart.value[index];
@@ -236,44 +242,38 @@ const addToCart = (product) => {
         }
     };
 
-    const checkout = () => {
-        // Logique de paiement
-        console.log('Paiement effectué');
-        // Réinitialiser le panier après le paiement
-        resetCart();
-    };
-
-
     const sendSaleData = () => {
-    // Construire l'objet de données à envoyer au contrôleur
-    const requestData = {
-        products: cart.value.map(item => ({
-            id: item.product.id,
-            quantity: item.quantity,
-            price: item.product.price // Ajoutez le prix de chaque produit
-        })),
-        client_id: null, // Insérez l'ID du client si nécessaire
-        payment_method: paymentMethod.value, // Récupérer la méthode de paiement sélectionnée
-        total_amount: totalAmount.value, // Récupérer le montant total du panier
-        payment_id: payment_id.value, // Ajoutez paymentId aux données envoyées
+        // Construire l'objet de données à envoyer au contrôleur
+        const requestData = {
+            products: cart.value.map(item => ({
+                id: item.product.id,
+                quantity: item.quantity,
+                price: item.product.price // Ajoutez le prix de chaque produit
+            })), 
+            client_id: client_id.value, // Insérez l'ID du client si nécessaire
+            total_amount: totalAmount.value, // Récupérer le montant total du panier
+            cash: amountPaidCash.value,
+            bancontact: amountPaidBancontact.value,
+            credit_card: amountPaidCreditcard.value,
+            payment_id: payment_id.value, // Ajoutez paymentId aux données envoyées
+        };
+
+        // envoi de la requete au contrôleur Laravel
+        axios.post('/api/sales', requestData)
+            .then(response => {
+                // Réinitialiser le panier après avoir enregistré la vente
+                resetCart();
+                client_id.value = null;
+                loadFromServer()
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'enregistrement de la vente:', error);
+            });
     };
-
-    // Envoyer la requête POST au contrôleur Laravel
-    axios.post('/api/sales', requestData)
-        .then(response => {
-            console.log(response.data); // Afficher la réponse du serveur (facultatif)
-            // Réinitialiser le panier après avoir enregistré la vente
-            resetCart();
-        })
-        .catch(error => {
-            console.error('Erreur lors de l\'enregistrement de la vente:', error);
-        });
-};
-
-
 
     watchEffect(() => {
         updateFilteredProducts();
+        updateFilteredClients();
     });
 
     const resetCart = () => {
