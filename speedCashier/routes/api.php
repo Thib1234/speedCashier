@@ -26,3 +26,5 @@ route::post('products', \App\Http\Controllers\Api\Product\StoreController::class
 
 route::get('clients', \App\Http\Controllers\Api\Client\IndexController::class)->name('clients.index');
 route::post('clients', \App\Http\Controllers\Api\Client\StoreController::class)->name('clients.store');
+
+route::post('sales', \App\Http\Controllers\Api\Sale\SaleController::class)->name('sales.store');

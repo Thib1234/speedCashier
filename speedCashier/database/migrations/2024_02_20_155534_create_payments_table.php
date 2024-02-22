@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->integer('price');
-            $table->integer('stock')->nullable();
+            $table->string('method');
+            $table->decimal('total_amount', 8, 2); // Ajoutez une colonne pour le montant total
             $table->timestamps();
+            $table->foreignId('sale_id')->constrained()->onDelete('cascade');
         });
+        
     }
 
     /**
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('payments');
     }
 };

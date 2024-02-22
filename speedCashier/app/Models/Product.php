@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Sale;
 
 class Product extends Model
 {
@@ -14,4 +16,11 @@ class Product extends Model
         'price',
         'stock',
     ];
+
+    public function sales(): BelongsToMany
+    {
+        return $this->belongsToMany(Sale::class)
+            ->withPivot('quantity', 'tax_amount');
+    }
+    
 }
