@@ -120,7 +120,6 @@
                             @click="addClient(client), showPopup = false"
                             class="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition duration-300 ease-in-out">
                             <h2 class="text-xl font-bold mb-2">{{ client.name }}</h2>
-                            <h4>{{ client.id }}</h4>
                         </div>
                     </div>
                 </div>
@@ -136,7 +135,8 @@
     import {
         ref,
         computed,
-        watchEffect
+        watchEffect,
+        onMounted
     } from 'vue';
     import {
         BanknotesIcon,
@@ -156,16 +156,24 @@
     const showPopup = ref(false);
     const filteredProducts = ref([]);
     const filteredClients = ref([]);
+    const isLoggedIn = document.cookie.includes('user_authenticated=true');
+
     const loadFromServer = async () => {
+        console.log('isso');
         await axios.get('/api/products')
             .then((res) => products.value = res.data.data)
             .catch((e) => console.log(e))
         await axios.get('/api/clients')
 			.then((res) => clients.value = res.data.data)
 			.catch((e) => console.log(e))
+
+        const userAuthenticatedCookie = document.cookie;
+        console.log('Contenu du cookie user_authenticated :', userAuthenticatedCookie);
     }
     //charge la liste des produits et des clients
     loadFromServer();
+
+    
 
     const addtotal = () => {
         // Vérifier le mode de paiement actif

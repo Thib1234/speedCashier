@@ -9,7 +9,16 @@
 
 <body>
     <div id="app">
-
+        @auth
+            <form action="{{ route('auth.logout') }}" method="post">
+                @method("delete")
+                @csrf
+                <button>Se déconnecter</button>
+            </form>
+        @endauth
+        @guest
+            <a href="{{ route('auth.login') }}">Se Connecter</a>
+        @endguest
         <heading></heading>
         @yield('content')
         

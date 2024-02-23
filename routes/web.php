@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,5 +25,9 @@ Route::view('/products/create', 'products.create')->name('products.create');
 
 
 Route::get('/register', [RegisterController::class, 'create']);
+
+Route::get('/login', [LoginController::class, 'login'])->name('auth.login');
+Route::post('/login', [LoginController::class, 'doLogin'])->name('auth.doLogin');
+Route::delete('/logout', [LoginController::class, 'logout'])->name('auth.logout');
 
 Route::view('/cashier', 'cashier')->name('cashier');

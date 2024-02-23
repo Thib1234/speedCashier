@@ -1,5 +1,9 @@
 @extends('app')
 
 @section('content')
-	<cashier> </cashier>
+
+@auth
+<cashier></cashier>
+@endauth
+	
 @endsection
