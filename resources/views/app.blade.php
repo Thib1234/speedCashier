@@ -10,18 +10,22 @@
 <body>
     <div id="app">
         @auth
-            <form action="{{ route('auth.logout') }}" method="post">
-                @method("delete")
-                @csrf
-                <button>Se déconnecter</button>
-            </form>
+        <form action="{{ route('auth.logout') }}" method="post">
+            @method("delete")
+            @csrf
+            <button>Se déconnecter</button>
+        </form>
+        <heading></heading>
+
         @endauth
         @guest
-            <a href="{{ route('auth.login') }}">Se Connecter</a>
+        <a href="{{ route('auth.login') }}">Se Connecter</a>
         @endguest
-        <heading></heading>
+
         @yield('content')
-        
+
+{{-- Faire une nouvelle page vierge de login.blade.php pour sans utiliser le extends pour pouvoir tout proteger avec un seul et unique --}}
+
     </div>
 </body>
 

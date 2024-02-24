@@ -126,7 +126,8 @@
 
 <script setup>
     import {
-        ref
+        ref,
+        defineProps
     } from 'vue'
     import {
         Dialog,
@@ -176,4 +177,11 @@
         }
     ]
     const mobileMenuOpen = ref(false)
+
+    const props = defineProps({
+    user: {
+    type: Object,
+    required: true
+}
+});
 </script>

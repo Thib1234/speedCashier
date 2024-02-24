@@ -16,19 +16,20 @@ class LoginController extends Controller
     }
 
     public function doLogin(LoginRequest $request)
-    {
-        $creditentials = $request->validated();
+{
+    $creditentials = $request->validated();
 
-        if(Auth::attempt($creditentials)){
-            $request->session()->regenerate();
-            return redirect()->intended(route('cashier'));
-        }
-
-        return to_route('auth.login')->withErrors([
-            'name' => 'Nom invalide'
-        ])->onlyInput('name');
-        
+    if(Auth::attempt($creditentials)){
+        $request->session()->regenerate();
+        $user = Auth::user();
+        // dd($user['name']);
+        return redirect()->intended(route('cashier'))->with('user', $user);
     }
+
+    return redirect()->route('auth.login')->withErrors([
+        'name' => 'Nom invalide'
+    ])->onlyInput('name');
+}
 
     public function logout(){
         Auth::logout();

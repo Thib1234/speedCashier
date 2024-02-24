@@ -10,16 +10,66 @@
             </div>
             <div v-if="filteredProducts.length === 0" class="text-gray-500 text-center mb-8">Aucun produit trouvé.</div>
             <div v-else class="grid grid-cols-6 gap-6">
-                <div v-for="product in filteredProducts" :key="product.id" @click="addToCart(product), searchQuery = ''"
+                <div v-for="(product, index) in displayedProducts" :key="product.id"
+                    @click="addToCart(product), searchQuery = ''"
                     class="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition duration-300 ease-in-out">
                     <h2 class="text-xl font-bold mb-2">{{ product.name }}</h2>
                     <p class="text-gray-700 text-lg">{{ product.price }} €</p>
                     <p class="text-gray-700 text-xs">stock : {{ product.stock }}</p>
                 </div>
             </div>
+            <div v-if="displayedProducts.length < filteredProducts.length" class="flex">
+                <button @click="showMore" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mt-4 mr-4">
+                    Afficher plus
+                </button>
+            </div>
+            <div class="flex">
+                <button @click="showLess" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mt-4">
+                    Afficher Moins
+                </button>
+            </div>
         </div>
         <div class="w-full max-w-3xl mt-10">
-            <h2 class="text-2xl font-bold mb-4 text-center">Panier</h2>
+            <div class="flex justify-between">
+                <div>
+                    <!-- Bouton pour afficher la pop-up -->
+                    <button @click="showPopup = true"
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                        Sélectionner un client
+                    </button>
+
+                    <!-- Pop-up pour sélectionner les clients -->
+                    <div v-if="showPopup"
+                        class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                        <div class="bg-white p-8 max-w-md mx-auto rounded shadow-lg">
+                            <h2 class="text-lg font-bold mb-4">Sélectionner un client</h2>
+                            <div class="w-full max-w-8xl">
+                                <div class="flex items-center justify-between bg-gray-100 p-6 mb-6 rounded-lg">
+                                    <input v-model="searchQueryClient" type="text" placeholder="Rechercher un client"
+                                        class="w-full mr-4 py-3 px-6 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg">
+                                    <button @click="searchQueryClient = ''"
+                                        class="py-3 px-6 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none text-lg">Effacer</button>
+                                </div>
+                                <div v-if="filteredClients.length === 0" class="text-gray-500 text-center mb-8">Aucun
+                                    client
+                                    trouvé.</div>
+                                <div v-else class="grid grid-cols-2 gap-6">
+                                    <div v-for="client in filteredClients" :key="client.id"
+                                        @click="addClient(client), showPopup = false"
+                                        class="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition duration-300 ease-in-out">
+                                        <h2 class="text-xl font-bold mb-2">{{ client.name }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <button @click="showPopup = false"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mt-10">
+                                Fermer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold mb-4">Panier</h2>
+            </div>
             <div v-if="cart.length === 0" class="text-gray-500 text-center mb-4">Le panier est vide.</div>
             <div v-else>
                 <div v-for="(item, index) in cart" :key="index"
@@ -96,47 +146,12 @@
         <span v-if="changeDue === 0" class="ml-4 text-green-500">Compte juste</span>
         <button @click="addtotal">{{ Math.abs(changeDue) }}</button>
     </div>
-    <div>
-        <!-- Bouton pour afficher la pop-up -->
-        <button @click="showPopup = true" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-            Sélectionner un client
-        </button>
-
-        <!-- Pop-up pour sélectionner les clients -->
-        <div v-if="showPopup" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-            <div class="bg-white p-8 max-w-md mx-auto rounded shadow-lg">
-                <h2 class="text-lg font-bold mb-4">Sélectionner un client</h2>
-                <div class="w-full max-w-8xl">
-                    <div class="flex items-center justify-between bg-gray-100 p-6 mb-6 rounded-lg">
-                        <input v-model="searchQueryClient" type="text" placeholder="Rechercher un client"
-                            class="w-full mr-4 py-3 px-6 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg">
-                        <button @click="searchQueryClient = ''"
-                            class="py-3 px-6 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none text-lg">Effacer</button>
-                    </div>
-                    <div v-if="filteredClients.length === 0" class="text-gray-500 text-center mb-8">Aucun client
-                        trouvé.</div>
-                    <div v-else class="grid grid-cols-2 gap-6">
-                        <div v-for="client in filteredClients" :key="client.id"
-                            @click="addClient(client), showPopup = false"
-                            class="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition duration-300 ease-in-out">
-                            <h2 class="text-xl font-bold mb-2">{{ client.name }}</h2>
-                        </div>
-                    </div>
-                </div>
-                <button @click="showPopup = false"
-                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mt-10">
-                    Fermer
-                </button>
-            </div>
-        </div>
-    </div>
 </template>
 <script setup>
     import {
         ref,
         computed,
-        watchEffect,
-        onMounted
+        watchEffect
     } from 'vue';
     import {
         BanknotesIcon,
@@ -156,25 +171,32 @@
     const showPopup = ref(false);
     const filteredProducts = ref([]);
     const filteredClients = ref([]);
-    const isLoggedIn = document.cookie.includes('user_authenticated=true');
+
+    const maxDisplayedProducts = ref(12); // Limite initiale de 18 produits à afficher
+
+    const displayedProducts = ref([]); // Liste des produits actuellement affichés
+
+    const updateFilteredProducts = () => {
+        const filtered = Object.values(products.value).filter(product =>
+            product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+        );
+        filteredProducts.value = filtered;
+    };
+
+    const updateDisplayedProducts = () => {
+        displayedProducts.value = filteredProducts.value.slice(0, maxDisplayedProducts.value);
+    };
 
     const loadFromServer = async () => {
-        console.log('isso');
         await axios.get('/api/products')
             .then((res) => products.value = res.data.data)
             .catch((e) => console.log(e))
         await axios.get('/api/clients')
-			.then((res) => clients.value = res.data.data)
-			.catch((e) => console.log(e))
-
-        const userAuthenticatedCookie = document.cookie;
-        console.log('Contenu du cookie user_authenticated :', userAuthenticatedCookie);
+            .then((res) => clients.value = res.data.data)
+            .catch((e) => console.log(e))
     }
     //charge la liste des produits et des clients
     loadFromServer();
-
-    
-
     const addtotal = () => {
         // Vérifier le mode de paiement actif
         if (paymentMethod.value === 'cash') {
@@ -206,11 +228,6 @@
         }
     };
 
-    const updateFilteredProducts = () => {
-        const filtered = Object.values(products.value).filter(product =>
-            product.name.toLowerCase().includes(searchQuery.value.toLowerCase()));
-        filteredProducts.value = filtered;
-    };
     const updateFilteredClients = () => {
         const filtered = Object.values(clients.value).filter(client =>
             client.name.toLowerCase().includes(searchQueryClient.value.toLowerCase()));
@@ -257,7 +274,7 @@
                 id: item.product.id,
                 quantity: item.quantity,
                 price: item.product.price // Ajoutez le prix de chaque produit
-            })), 
+            })),
             client_id: client_id.value, // Insérez l'ID du client si nécessaire
             total_amount: totalAmount.value, // Récupérer le montant total du panier
             cash: amountPaidCash.value,
@@ -281,6 +298,7 @@
 
     watchEffect(() => {
         updateFilteredProducts();
+        updateDisplayedProducts();
         updateFilteredClients();
     });
 
@@ -292,9 +310,11 @@
         amountPaidBancontact.value = 0
         amountPaidCreditcard.value = 0
     }
-
+    const showMore = () => {
+        // Afficher plus de produits en ajoutant une certaine quantité au nombre maximal de produits affichés
+        maxDisplayedProducts.value += 6; // Vous pouvez ajuster la quantité ajoutée selon vos besoins
+    };
+    const showLess = () => {
+        maxDisplayedProducts.value -= 6;
+    }
 </script>
-
-<style>
-  /* Styles Tailwind ici */
-</style>
