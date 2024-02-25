@@ -23,11 +23,13 @@
                     Afficher plus
                 </button>
             </div>
-            <div class="flex">
+            
+            <!-- A TERMINER ET REPRENDRE
+                <div class="flex">
                 <button @click="showLess" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mt-4">
                     Afficher Moins
                 </button>
-            </div>
+            </div> -->
         </div>
         <div class="w-full max-w-3xl mt-10">
             <div class="flex justify-between">
@@ -314,7 +316,9 @@
         // Afficher plus de produits en ajoutant une certaine quantité au nombre maximal de produits affichés
         maxDisplayedProducts.value += 6; // Vous pouvez ajuster la quantité ajoutée selon vos besoins
     };
-    const showLess = () => {
-        maxDisplayedProducts.value -= 6;
-    }
+
+    // A REPRENDRE ET TERMINER
+    // const showLess = () => {
+    //     maxDisplayedProducts.value -= 6;
+    // }
 </script>
