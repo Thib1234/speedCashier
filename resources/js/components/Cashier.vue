@@ -10,12 +10,12 @@
             </div>
             <div v-if="filteredProducts.length === 0" class="text-gray-500 text-center mb-8">Aucun produit trouvé.</div>
             <div v-else class="grid grid-cols-6 gap-6">
-                <div v-for="(product, index) in displayedProducts" :key="product.id"
+                <div v-for="product in displayedProducts" :key="product.id"
                     @click="addToCart(product), searchQuery = ''"
                     class="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition duration-300 ease-in-out">
                     <h2 class="text-xl font-bold mb-2">{{ product.name }}</h2>
                     <p class="text-gray-700 text-lg">{{ product.price }} €</p>
-                    <p class="text-gray-700 text-xs">stock : {{ product.stock }}</p>
+                    <p v-if="product.stock >= 0 && product.stock" class="text-gray-700 text-xs">stock : {{ product.stock }}</p>
                 </div>
             </div>
             <div v-if="displayedProducts.length < filteredProducts.length" class="flex">
@@ -32,17 +32,27 @@
             </div> -->
         </div>
         <div class="w-full max-w-3xl mt-10">
-            <div class="flex justify-between">
+            <div class="flex flex-col items-center">
                 <div>
                     <!-- Bouton pour afficher la pop-up -->
-                    <button @click="showPopup = true"
-                        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-                        Sélectionner un client
-                    </button>
+                    <div class="flex">
+                        <button v-if="client_id == null" @click="showPopup = true"
+                            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                            Sélectionner un client
+                        </button>
+                        <div v-else>
+                            <span class="mr-2">Client selectionné : {{ clients[client_id - 1].name }}</span>
+                            <button @click="showPopup = true"
+                            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                            Changer de client
+                            </button>
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-5" @click="client_id = null">Ne plus selectionner de client</button>
+                        </div>
+                    </div>
 
                     <!-- Pop-up pour sélectionner les clients -->
                     <div v-if="showPopup"
-                        class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                        class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
                         <div class="bg-white p-8 max-w-md mx-auto rounded shadow-lg">
                             <h2 class="text-lg font-bold mb-4">Sélectionner un client</h2>
                             <div class="w-full max-w-8xl">
@@ -70,15 +80,16 @@
                         </div>
                     </div>
                 </div>
-                <h2 class="text-2xl font-bold mb-4">Panier</h2>
+                
             </div>
+            <h2 class="text-2xl font-bold mb-4 text-center">Panier</h2>
             <div v-if="cart.length === 0" class="text-gray-500 text-center mb-4">Le panier est vide.</div>
             <div v-else>
                 <div v-for="(item, index) in cart" :key="index"
                     class="flex justify-between items-center bg-gray-100 p-6 mb-4 rounded-lg">
                     <div class="text-lg">{{ item.product.name }}</div>
                     <div class="text-lg">{{ item.product.price }} €</div>
-                    <div class="text-xs">stock : {{ item.product.stock }}</div>
+                    <div v-if="item.product.stock >=0 && item.product.stock" class="text-xs">stock : {{ item.product.stock }}</div>
 
                     <div class="flex items-center">
                         <button @click="removeFromCart(index)"
@@ -173,6 +184,7 @@
     const showPopup = ref(false);
     const filteredProducts = ref([]);
     const filteredClients = ref([]);
+    const accessToken = localStorage.getItem('accessToken');
 
     const maxDisplayedProducts = ref(12); // Limite initiale de 18 produits à afficher
 
@@ -290,7 +302,6 @@
             .then(response => {
                 // Réinitialiser le panier après avoir enregistré la vente
                 resetCart();
-                client_id.value = null;
                 loadFromServer()
             })
             .catch(error => {
@@ -311,6 +322,7 @@
         amountPaidCash.value = 0
         amountPaidBancontact.value = 0
         amountPaidCreditcard.value = 0
+        client_id.value = null
     }
     const showMore = () => {
         // Afficher plus de produits en ajoutant une certaine quantité au nombre maximal de produits affichés

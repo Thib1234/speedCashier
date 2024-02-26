@@ -18,7 +18,8 @@ class StoreController extends Controller
         $validated = $request->validate([
             'name' => 'required|string',
             'price' => 'required|integer',
-            'stock' => 'required|integer',
+            'stock' => 'integer',
+            'purchase_price' => 'integer',
         ]);
 
         $product = Product::create($validated);

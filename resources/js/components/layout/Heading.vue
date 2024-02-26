@@ -116,10 +116,8 @@
             <DialogPanel
                 class="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                 <div class="flex items-center justify-between">
-                    <a href="#" class="-m-1.5 p-1.5">
-                        <span class="sr-only">Your Company</span>
-                        <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                            alt="" />
+                    <a href="/cashier" class="-m-1.5 p-1.5">
+                        Cesar et Rosalie
                     </a>
                     <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700" @click="mobileMenuOpen = false">
                         <span class="sr-only">Close menu</span>
@@ -136,6 +134,12 @@
                                     <ChevronDownIcon :class="[open ? 'rotate-180' : '', 'h-5 w-5 flex-none']"
                                         aria-hidden="true" />
                                 </DisclosureButton>
+                                <DisclosurePanel class="mt-2 space-y-2">
+                                    <DisclosureButton v-for="item in products" :key="item.name"
+                                        as="a" :href="item.href"
+                                        class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                        {{ item.name }}</DisclosureButton>
+                                </DisclosurePanel>
                             </Disclosure>
                             <a href="#"
                                 class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Features</a>
@@ -162,13 +166,14 @@
     } from 'vue'
     import {
         Dialog,
-        DialogPanel,
-        Disclosure,
-        DisclosureButton,
-        Popover,
-        PopoverButton,
-        PopoverGroup,
-        PopoverPanel,
+    DialogPanel,
+    Disclosure,
+    DisclosureButton,
+    DisclosurePanel,
+    Popover,
+    PopoverButton,
+    PopoverGroup,
+    PopoverPanel,
     } from '@headlessui/vue'
     import {
         Bars3Icon,
@@ -218,9 +223,10 @@
         {
             name: 'Stats',
             description: 'Affiche les stats générales',
-            href: '/clients/index',
+            href: '/compta/stats',
             icon: ChartBarIcon
         }
     ]
     const mobileMenuOpen = ref(false)
+
 </script>

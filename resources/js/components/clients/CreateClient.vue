@@ -18,7 +18,7 @@
 
 
                 </div>
-                <button type="button" v-on:click="createProduct"
+                <button type="button" v-on:click="createClient"
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Créer un nouveau client
                 </button>
@@ -43,7 +43,7 @@ const formData = ref({
 let success = ref(false);
 
 
-const createProduct = async () => {
+const createClient = async () => {
     await axios.post('/api/clients', formData.value)
         .then((res) => {
             errors.value = {};

@@ -28,6 +28,7 @@ Route::group(['middleware' =>['auth:sanctum']], function(){
 
     route::post('sales', \App\Http\Controllers\Api\Sale\SaleController::class)->name('sales.store');
     route::get('daily-stats', \App\Http\Controllers\Api\Compta\DailyStatsController::class)->name('compta.daily');
+    route::get('stats', \App\Http\Controllers\Api\Compta\StatsController::class)->name('compta.stats');
 });
 
 route::post('register', \App\Http\Controllers\Api\Auth\RegisterController::class)->name('users.store');

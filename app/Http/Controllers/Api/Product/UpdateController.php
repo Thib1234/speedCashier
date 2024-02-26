@@ -17,7 +17,8 @@ class UpdateController extends Controller
 	{
 		$validatedData = $request->validate([
 			'name' => 'required|string|max:255',
-			'stock' => 'required|integer|min:0',
+			'stock' => 'nullable',
+			'purchase_price' => 'nullable',
 			'price' => 'required|numeric|min:0',
 		]);
 

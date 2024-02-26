@@ -27,6 +27,7 @@ class ProductFactory extends Factory
             'name' => fake()->name(),
             'price' => fake()->randomNumber(3, false),
             'stock' => fake()->randomNumber(1, false),
+            'purchase_price' => fake()->randomNumber(1, false),
         ];
     }
 

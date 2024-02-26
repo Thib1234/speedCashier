@@ -9,31 +9,34 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-
     public function login()
     {
         return view('auth.login');
     }
 
     public function doLogin(LoginRequest $request)
-{
-    $creditentials = $request->validated();
+    {
+        $credentials = $request->validated();
 
-    if(Auth::attempt($creditentials)){
-        $request->session()->regenerate();
-        $user = Auth::user();
-        // dd($user['name']);
-        return redirect()->intended(route('cashier'))->with('user', $user);
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            $user = Auth::user();
+
+            // Créer un jeton d'authentification pour cet utilisateur
+            $token = $user->createToken('Token Name')->plainTextToken;
+
+            // Rediriger vers la page souhaitée avec le jeton
+            return redirect()->intended(route('cashier'))->with('user', $user)->with('token', $token);
+        }
+
+        return redirect()->route('auth.login')->withErrors([
+            'name' => 'Nom invalide'
+        ])->onlyInput('name');
     }
 
-    return redirect()->route('auth.login')->withErrors([
-        'name' => 'Nom invalide'
-    ])->onlyInput('name');
-}
-
-    public function logout(){
+    public function logout()
+    {
         Auth::logout();
-        return to_route('auth.login');
+        return redirect()->route('auth.login');
     }
-    
 }

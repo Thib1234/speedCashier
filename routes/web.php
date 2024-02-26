@@ -22,6 +22,7 @@ Route::view('/clients/index', 'clients.index')->name('users.index');
 Route::view('/products/index', 'products.index')->name('products.index');
 Route::view('/products/create', 'products.create')->name('products.create');
 Route::view('/compta/daily', 'compta.daily')->name('compta.daily');
+Route::view('/compta/stats', 'compta.stats')->name('compta.stats');
 
 
 
