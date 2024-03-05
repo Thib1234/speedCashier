@@ -56,6 +56,6 @@ class SaleController extends Controller
         $payment->save();
     
         // Réponse de succès
-        return response()->json(['message' => 'Vente enregistrée avec succès'], 201);
+        return response()->json(['message' => 'Vente enregistrée avec succès', 'sale_id' => $sale->id], 201);
     }
 }

@@ -15,7 +15,8 @@
                     class="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition duration-300 ease-in-out">
                     <h2 class="text-xl font-bold mb-2">{{ product.name }}</h2>
                     <p class="text-gray-700 text-lg">{{ product.price }} €</p>
-                    <p v-if="product.stock >= 0 && product.stock" class="text-gray-700 text-xs">stock : {{ product.stock }}</p>
+                    <p v-if="product.stock >= 0 && product.stock" class="text-gray-700 text-xs">stock :
+                        {{ product.stock }}</p>
                 </div>
             </div>
             <div v-if="displayedProducts.length < filteredProducts.length" class="flex">
@@ -23,18 +24,11 @@
                     Afficher plus
                 </button>
             </div>
-            
-            <!-- A TERMINER ET REPRENDRE
-                <div class="flex">
-                <button @click="showLess" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mt-4">
-                    Afficher Moins
-                </button>
-            </div> -->
         </div>
         <div class="w-full max-w-3xl mt-10">
             <div class="flex flex-col items-center">
                 <div>
-                    <!-- Bouton pour afficher la pop-up -->
+                    <!-- Bouton pour afficher la pop-up de selection du client -->
                     <div class="flex">
                         <button v-if="client_id == null" @click="showPopup = true"
                             class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
@@ -43,13 +37,13 @@
                         <div v-else>
                             <span class="mr-2">Client selectionné : {{ clients[client_id - 1].name }}</span>
                             <button @click="showPopup = true"
-                            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-                            Changer de client
+                                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                                Changer de client
                             </button>
-                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-5" @click="client_id = null">Ne plus selectionner de client</button>
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-5"
+                                @click="client_id = null">Ne plus selectionner de client</button>
                         </div>
                     </div>
-
                     <!-- Pop-up pour sélectionner les clients -->
                     <div v-if="showPopup"
                         class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
@@ -80,7 +74,6 @@
                         </div>
                     </div>
                 </div>
-                
             </div>
             <h2 class="text-2xl font-bold mb-4 text-center">Panier</h2>
             <div v-if="cart.length === 0" class="text-gray-500 text-center mb-4">Le panier est vide.</div>
@@ -89,8 +82,8 @@
                     class="flex justify-between items-center bg-gray-100 p-6 mb-4 rounded-lg">
                     <div class="text-lg">{{ item.product.name }}</div>
                     <div class="text-lg">{{ item.product.price }} €</div>
-                    <div v-if="item.product.stock >=0 && item.product.stock" class="text-xs">stock : {{ item.product.stock }}</div>
-
+                    <div v-if="item.product.stock >=0 && item.product.stock" class="text-xs">stock :
+                        {{ item.product.stock }}</div>
                     <div class="flex items-center">
                         <button @click="removeFromCart(index)"
                             class="text-red-500 font-bold focus:outline-none text-lg">-</button>
@@ -101,8 +94,24 @@
                 </div>
                 <div class="text-2xl font-bold text-right">Total: {{ totalAmount }} €</div>
                 <input type="hidden" v-model.number="payment_id" name="payment_id">
-                <button v-if="changeDue === 0" @click="sendSaleData"
-                    class="w-full bg-blue-500 text-white py-4 rounded-lg mt-8 hover:bg-blue-600 focus:outline-none text-xl">Payer</button>
+                <div>
+                    <button v-if="changeDue === 0" @click="confirmPayment"
+                        class="w-full bg-blue-500 text-white py-4 rounded-lg mt-8 hover:bg-blue-600 focus:outline-none text-xl">Payer</button>
+                </div>
+                <!-- Modale de confirmation de paiement + création du ticket de caisse -->
+                <div v-if="showConfirmationModal"
+                    class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+                    <div class="bg-white p-8 max-w-md mx-auto rounded shadow-lg">
+                        <h2 class="text-lg font-bold mb-4">Confirmation de paiement</h2>
+                        <p class="mb-4">Voulez-vous créer un ticket de caisse pour cette transaction ?</p>
+                        <div class="flex justify-between">
+                            <button @click="createTicketAndPay"
+                                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Oui</button>
+                            <button @click="cancelPayment"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Non</button>
+                        </div>
+                    </div>
+                </div>
                 <button @click="resetCart"
                     class="w-full bg-red-500 text-white py-4 rounded-lg mt-8 hover:bg-red-600 focus:outline-none text-xl">Annuler
                     la vente</button>
@@ -184,7 +193,8 @@
     const showPopup = ref(false);
     const filteredProducts = ref([]);
     const filteredClients = ref([]);
-    const accessToken = localStorage.getItem('accessToken');
+    const sale_id = ref(null);
+    const showConfirmationModal = ref(false);
 
     const maxDisplayedProducts = ref(12); // Limite initiale de 18 produits à afficher
 
@@ -234,11 +244,11 @@
         paymentMethod.value = method;
         // Mettre à jour paymentId en fonction du mode de paiement sélectionné
         if (method === 'cash') {
-            payment_id.value = 1; // Remplacez par l'ID correspondant dans votre base de données
+            payment_id.value = 1;
         } else if (method === 'bancontact') {
-            payment_id.value = 2; // Remplacez par l'ID correspondant dans votre base de données
+            payment_id.value = 2;
         } else if (method === 'credit_card') {
-            payment_id.value = 3; // Remplacez par l'ID correspondant dans votre base de données
+            payment_id.value = 3;
         }
     };
 
@@ -253,6 +263,7 @@
     }
 
     const addToCart = (product) => {
+        //regarde si le produit est déjà présent dans le panier
         const existingItem = cart.value.find(item => item.product.id === product.id);
         if (existingItem) {
             existingItem.quantity++;
@@ -267,7 +278,6 @@
                 });
             } else {
                 console.error('Le prix du produit est indéfini.');
-                // Vous pouvez gérer cette erreur de manière appropriée, par exemple, en affichant un message à l'utilisateur.
             }
         }
     }
@@ -281,28 +291,33 @@
         }
     };
 
-    const sendSaleData = () => {
-        // Construire l'objet de données à envoyer au contrôleur
+    const sendSaleData = async() => {
+        // Construction l'objet de données à envoyer au contrôleur
         const requestData = {
             products: cart.value.map(item => ({
                 id: item.product.id,
                 quantity: item.quantity,
-                price: item.product.price // Ajoutez le prix de chaque produit
+                price: item.product.price 
             })),
-            client_id: client_id.value, // Insérez l'ID du client si nécessaire
-            total_amount: totalAmount.value, // Récupérer le montant total du panier
+            client_id: client_id.value, // Insére l'ID du client si nécessaire
+            total_amount: totalAmount.value, // Récupére le montant total du panier
             cash: amountPaidCash.value,
             bancontact: amountPaidBancontact.value,
             credit_card: amountPaidCreditcard.value,
             payment_id: payment_id.value, // Ajoutez paymentId aux données envoyées
         };
 
-        // envoi de la requete au contrôleur Laravel
-        axios.post('/api/sales', requestData)
+        // envoi de la requete au contrôleur Laravel pour la création du ticket de caisse
+        await axios.post('/api/sales', requestData)
             .then(response => {
                 // Réinitialiser le panier après avoir enregistré la vente
                 resetCart();
-                loadFromServer()
+                loadFromServer();
+                sale_id.value = response.data.sale_id;
+            console.log('ID de la vente:', sale_id.value);
+            
+            // Maintenant que nous avons l'ID de la vente, nous générons le ticket de caisse
+            generateTicket(sale_id.value);
             })
             .catch(error => {
                 console.error('Erreur lors de l\'enregistrement de la vente:', error);
@@ -326,8 +341,38 @@
     }
     const showMore = () => {
         // Afficher plus de produits en ajoutant une certaine quantité au nombre maximal de produits affichés
-        maxDisplayedProducts.value += 6; // Vous pouvez ajuster la quantité ajoutée selon vos besoins
+        maxDisplayedProducts.value += 6;
     };
+
+    // TICKETS
+    const confirmPayment = () => {
+        // Affichez la modale de confirmation lorsque le bouton "Payer" est cliqué
+        showConfirmationModal.value = true;
+    };
+
+    const cancelPayment = () => {
+        // ne fait pas de ticket de caisse mais enregistre la vente
+        sendSaleData();
+        showConfirmationModal.value = false;
+    };
+
+    const createTicketAndPay = () => {
+        // Créez le ticket de caisse et procédez au paiement
+        sendSaleData(); // Envoye les données de la vente
+        generateTicket(); // Génére le ticket de caisse
+        showConfirmationModal.value = false; // Ferme la modale de confirmation
+    };
+
+    const generateTicket = (saleId) => {
+    // Envoyer une demande au backend pour générer le ticket de caisse
+    axios.post('/api/pdf', saleId)
+        .then(response => {
+            console.log(response);
+        })
+        .catch(error => {
+            console.error('Erreur lors de la génération du ticket de caisse:', error);
+        });
+};
 
     // A REPRENDRE ET TERMINER
     // const showLess = () => {

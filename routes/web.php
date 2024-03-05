@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Pdf\TicketController;
+use App\Http\Controllers\PDFController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +26,9 @@ Route::view('/products/create', 'products.create')->name('products.create');
 Route::view('/compta/daily', 'compta.daily')->name('compta.daily');
 Route::view('/compta/stats', 'compta.stats')->name('compta.stats');
 
+Route::get('/pdf', [TicketController::class, 'viewTicket'])->name('pdf.view');
+
+Route::get('/generate-pdf', [PDFController::class, 'generatePDF']);
 
 
 

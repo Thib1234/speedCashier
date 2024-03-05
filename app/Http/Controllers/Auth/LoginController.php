@@ -16,6 +16,11 @@ class LoginController extends Controller
 
     public function doLogin(LoginRequest $request)
     {
+
+        //tenter de créer une fonction pour protegere la connexion.
+        $date = now('GMT+1'); // ok affiche l'heure au bon fuseau horaire
+
+        $date->toTimeString(); // ne fonctionne pas
         $credentials = $request->validated();
 
         if (Auth::attempt($credentials)) {
@@ -29,8 +34,9 @@ class LoginController extends Controller
             return redirect()->intended(route('cashier'))->with('user', $user)->with('token', $token);
         }
 
+        // dd('il est ' . $date);
         return redirect()->route('auth.login')->withErrors([
-            'name' => 'Nom invalide'
+            'name' => 'erreur dans le nom'
         ])->onlyInput('name');
     }
 
