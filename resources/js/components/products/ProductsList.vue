@@ -10,15 +10,15 @@
                     </div>
                     <div class="mb-4">
                         <label for="stock" class="block text-lg font-semibold mb-2">Stock:</label>
-                        <input type="number" v-model="product.stock" id="stock" class="border-b border-gray-400 focus:outline-none rounded-lg px-4 py-2 w-full">
+                        <input v-model="product.stock" id="stock" class="border-b border-gray-400 focus:outline-none rounded-lg px-4 py-2 w-full" type="number">
                     </div>
                     <div class="mb-4">
                         <label for="price" class="block text-lg font-semibold mb-2">Prix:</label>
-                        <input type="number" v-model="product.price" id="price" class="border-b border-gray-400 focus:outline-none rounded-lg px-4 py-2 w-full">
+                        <input v-model="product.price" id="price" class="border-b border-gray-400 focus:outline-none rounded-lg px-4 py-2 w-full" type="text">
                     </div>
                     <div class="mb-4">
                         <label for="purchase_price" class="block text-lg font-semibold mb-2">Prix d'achat:</label>
-                        <input type="number" v-model="product.purchase_price" id="purchase_price" class="border-b border-gray-400 focus:outline-none rounded-lg px-4 py-2 w-full">
+                        <input v-model="product.purchase_price" id="purchase_price" class="border-b border-gray-400 focus:outline-none rounded-lg px-4 py-2 w-full" type="text">
                     </div>
                     <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Enregistrer</button>
                 </form>
