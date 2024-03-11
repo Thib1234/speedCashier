@@ -25,11 +25,17 @@
                 </button>
             </div>
         </div>
+
+
         <div class="w-full max-w-3xl mt-10">
             <div class="flex flex-col items-center">
                 <div>
                     <!-- Bouton pour afficher la pop-up de selection du client -->
                     <div class="flex">
+                        <button @click="showPopUpTempProduct = true"
+                            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">
+                            Ajouter Produit Temporaire
+                        </button>
                         <button v-if="client_id == null" @click="showPopup = true"
                             class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
                             Sélectionner un client
@@ -71,6 +77,30 @@
                                 class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mt-10">
                                 Fermer
                             </button>
+                        </div>
+                    </div>
+                    <div v-if="showPopUpTempProduct"
+                        class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+                        <div class="bg-white p-8 max-w-md mx-auto rounded shadow-lg">
+                            <h2 class="text-lg font-bold mb-4">Ajouter un produit temporaire</h2>
+                            <div class="w-full max-w-8xl">
+                                <label for="product-name" class="block font-semibold mb-2">Nom du produit :</label>
+                                <input v-model="tempProductName" id="product-name" type="text"
+                                    class="w-full px-4 py-2 border rounded mb-4">
+
+                                <label for="product-price" class="block font-semibold mb-2">Prix du produit :</label>
+                                <input v-model="tempProductPrice" id="product-price" type="number" step="0.01"
+                                    class="w-full px-4 py-2 border rounded mb-4">
+
+                                <button @click="addTemporaryProduct(tempProductName, tempProductPrice), showPopUpTempProduct = false"
+                                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4">
+                                    Ajouter
+                                </button>
+                                <button @click="showPopUpTempProduct = false"
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mt-4">
+                                    Fermer
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -191,10 +221,14 @@
     const amountPaidBancontact = ref(0);
     const amountPaidCreditcard = ref(0);
     const showPopup = ref(false);
+    const showPopUpTempProduct = ref(false);
     const filteredProducts = ref([]);
     const filteredClients = ref([]);
     const sale_id = ref(null);
     const showConfirmationModal = ref(false);
+    const temporaryProduct = ref(null);
+    const tempProductName = ref(null);
+    const tempProductPrice = ref(null);
 
     const maxDisplayedProducts = ref(12); // Limite initiale de 18 produits à afficher
 
@@ -209,6 +243,17 @@
 
     const updateDisplayedProducts = () => {
         displayedProducts.value = filteredProducts.value.slice(0, maxDisplayedProducts.value);
+    };
+
+    const addTemporaryProduct = (name, price) => {
+        temporaryProduct.value = {
+            id: null, // Vous pouvez attribuer un ID temporaire si nécessaire
+            name: name,
+            price: price,
+        };
+        addToCart(temporaryProduct.value); // Ajoutez le produit temporaire au panier
+        tempProductName.value = null;
+        tempProductPrice.value = null;
     };
 
     const loadFromServer = async () => {
@@ -237,7 +282,8 @@
     });
 
     const changeDue = computed(() => {
-        return (amountPaidCash.value + amountPaidBancontact.value + amountPaidCreditcard.value) - totalAmount.value;
+        return (amountPaidCash.value + amountPaidBancontact.value + amountPaidCreditcard.value) - totalAmount
+            .value;
     });
 
     const selectpaymentMethod = (method) => {
@@ -291,20 +337,19 @@
         }
     };
 
-    const sendSaleData = async() => {
+    const sendSaleData = async () => {
         // Construction l'objet de données à envoyer au contrôleur
         const requestData = {
             products: cart.value.map(item => ({
                 id: item.product.id,
                 quantity: item.quantity,
-                price: item.product.price 
+                price: item.product.price
             })),
             client_id: client_id.value, // Insére l'ID du client si nécessaire
             total_amount: totalAmount.value, // Récupére le montant total du panier
             cash: amountPaidCash.value,
             bancontact: amountPaidBancontact.value,
             credit_card: amountPaidCreditcard.value,
-            payment_id: payment_id.value, // Ajoutez paymentId aux données envoyées
         };
 
         // envoi de la requete au contrôleur Laravel pour la création du ticket de caisse
@@ -314,10 +359,10 @@
                 resetCart();
                 loadFromServer();
                 sale_id.value = response.data.sale_id;
-            console.log('ID de la vente:', sale_id.value);
-            
-            // Maintenant que nous avons l'ID de la vente, nous générons le ticket de caisse
-            generateTicket(sale_id.value);
+                console.log('ID de la vente:', sale_id.value);
+
+                // Maintenant que nous avons l'ID de la vente, nous générons le ticket de caisse
+                generateTicket(sale_id.value);
             })
             .catch(error => {
                 console.error('Erreur lors de l\'enregistrement de la vente:', error);
@@ -364,18 +409,19 @@
     };
 
     const generateTicket = (saleId) => {
-    // Envoyer une demande au backend pour générer le ticket de caisse
-    axios.post('/api/pdf', saleId)
-        .then(response => {
-            console.log(response);
-        })
-        .catch(error => {
-            console.error('Erreur lors de la génération du ticket de caisse:', error);
-        });
-};
+        // Envoyer une demande au backend pour générer le ticket de caisse
+        axios.post('/api/pdf', saleId)
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.error('Erreur lors de la génération du ticket de caisse:', error);
+            });
+    };
 
     // A REPRENDRE ET TERMINER
     // const showLess = () => {
     //     maxDisplayedProducts.value -= 6;
     // }
+
 </script>
