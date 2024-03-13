@@ -268,9 +268,6 @@
         tempProductPrice.value = null;
     };
 
-
-
-
     const loadFromServer = async () => {
         await axios.get('/api/products')
             .then((res) => products.value = res.data.data)
@@ -387,7 +384,6 @@
             });
     };
 
-
     watchEffect(() => {
         updateFilteredProducts();
         updateDisplayedProducts();
@@ -437,10 +433,5 @@
                 console.error('Erreur lors de la génération du ticket de caisse:', error);
             });
     };
-
-    // A REPRENDRE ET TERMINER
-    // const showLess = () => {
-    //     maxDisplayedProducts.value -= 6;
-    // }
 
 </script>

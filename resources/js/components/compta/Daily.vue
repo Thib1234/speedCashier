@@ -1,28 +1,36 @@
 <template>
     <div class="container mx-auto">
+        <!-- Statistiques de ventes -->
         <h2 class="text-3xl font-semibold mb-4">Statistiques de ventes pour aujourd'hui</h2>
         <div class="mb-4">
             <p><span class="font-semibold">Total des ventes:</span> {{ totalSales }}</p>
             <p><span class="font-semibold">Nombre de clients:</span> {{ totalClients }}</p>
-            <p><span class="font-semibold">Montant total:</span> {{ totalVentes }}</p>
+            <p><span class="font-semibold">Montant total:</span> {{ totalPayments }}</p>
         </div>
+
+        <!-- Chargement en cours ou graphique -->
         <div v-if="loading" class="text-gray-600">Chargement en cours...</div>
         <div v-else>
             <canvas ref="salesChartCanvas" width="400" height="200"></canvas>
         </div>
-    </div>
-    <h2 class="text-3xl font-semibold mb-4">Historique des ventes du jour</h2>
-    <div class="mb-4">
-        <div v-for="vente in salesLines" :key="vente.id">
-            <p><span class="font-semibold">ID Vente:</span> {{ vente.id }}</p>
-            <p><span class="font-semibold">Total:</span> {{ vente.total }}</p>
-            <ul>
-                <li v-for="product in vente.products" :key="product.id">
-                    {{ product.name }} - {{ product.price }}
-                </li>
-            </ul>
-            <button @click="deleteSale(vente.id)"
-                class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mt-2">Supprimer</button>
+
+        <!-- Lignes de vente -->
+        <div class="mt-8">
+            <h2 class="text-3xl font-semibold mb-4">Lignes de vente du jour</h2>
+            <div v-if="salesLines.length === 0">
+                <p>Aucune vente pour aujourd'hui.</p>
+            </div>
+            <div v-else>
+                <div v-for="sale in salesLines" :key="sale.id" class="border p-4 mb-4">
+                    <p><span class="font-semibold">ID Vente:</span> {{ sale.id }}</p>
+                    <p><span class="font-semibold">Nom du produit:</span> {{ sale.product_name }}</p>
+                    <p><span class="font-semibold">Quantité:</span> {{ sale.quantity }}</p>
+                    <p><span class="font-semibold">Prix:</span> {{ sale.price }}</p>
+                    <!-- Ajoutez d'autres détails de vente si nécessaire -->
+                    <button @click="deleteSale(sale.id)" class="bg-red-500 text-white px-4 py-2 mt-2">Supprimer la
+                        vente</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -41,8 +49,9 @@
     let salesChart = null;
     const totalSales = ref(0);
     const totalClients = ref(0);
-    const totalVentes = ref(0);
+    const totalPayments = ref(0);
     const salesLines = ref([]);
+
 
     onMounted(async () => {
         try {
@@ -50,12 +59,12 @@
             const data = response.data;
             totalSales.value = data.total_sales;
             totalClients.value = data.total_clients;
-            totalVentes.value = data.total_payments;
-            salesLines.value = data.sale_lines; // Assuming your backend sends sale lines with products
+            totalPayments.value = data.total_payments;
+            salesLines.value = data.sale_lines; // Mettez à jour salesLines avec les données de l'API
             await nextTick();
             loading.value = false;
             renderChart(data);
-            console.log(salesLines.value);
+            console.log(salesLines.value); // Assurez-vous que salesLines est mis à jour correctement
         } catch (error) {
             console.error('Error fetching daily stats:', error.response.data.message);
         }
@@ -97,6 +106,15 @@
             const response = await axios.delete(`/api/sales/${saleId}`);
             const deletedSaleId = response.data.sale_id;
             // Mettre à jour l'affichage en supprimant la vente de la liste
+            salesLines.value = salesLines.value.filter(sale => sale.id !== deletedSaleId);
+        } catch (error) {
+            console.error('Erreur lors de la suppression de la vente:', error.response.data.message);
+        }
+    }
+    async function deleteSale(saleId) {
+        try {
+            const response = await axios.delete(`/api/sales/${saleId}`);
+            const deletedSaleId = response.data.sale_id;
             salesLines.value = salesLines.value.filter(sale => sale.id !== deletedSaleId);
         } catch (error) {
             console.error('Erreur lors de la suppression de la vente:', error.response.data.message);

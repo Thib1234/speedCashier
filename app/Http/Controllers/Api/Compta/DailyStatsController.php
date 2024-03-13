@@ -38,7 +38,7 @@ class DailyStatsController extends Controller
     $saleLines = [];
     foreach ($sales as $sale) {
         $product = Product::find($sale->product_id);
-
+    
         // Vérifiez si le produit existe avant d'essayer d'accéder à ses propriétés
         if ($product) {
             $saleLine = [
