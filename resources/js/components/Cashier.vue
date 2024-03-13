@@ -84,6 +84,10 @@
                         <div class="bg-white p-8 max-w-md mx-auto rounded shadow-lg">
                             <h2 class="text-lg font-bold mb-4">Ajouter un produit temporaire</h2>
                             <div class="w-full max-w-8xl">
+                                <!-- Afficher tous les produits temporaires -->
+                                <div v-for="(product, index) in temporaryProducts" :key="index">
+                                    <p>{{ product.name }} - {{ product.price }} €</p>
+                                </div>
                                 <label for="product-name" class="block font-semibold mb-2">Nom du produit :</label>
                                 <input v-model="tempProductName" id="product-name" type="text"
                                     class="w-full px-4 py-2 border rounded mb-4">
@@ -92,17 +96,15 @@
                                 <input v-model="tempProductPrice" id="product-price" type="number" step="0.01"
                                     class="w-full px-4 py-2 border rounded mb-4">
 
-                                <button @click="addTemporaryProduct(tempProductName, tempProductPrice), showPopUpTempProduct = false"
-                                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4">
-                                    Ajouter
-                                </button>
+                                <button
+                                    @click="addTemporaryProduct(tempProductName, tempProductPrice), showPopUpTempProduct = false"
+                                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4">Ajouter</button>
                                 <button @click="showPopUpTempProduct = false"
-                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mt-4">
-                                    Fermer
-                                </button>
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mt-4">Fermer</button>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
             <h2 class="text-2xl font-bold mb-4 text-center">Panier</h2>
@@ -226,7 +228,7 @@
     const filteredClients = ref([]);
     const sale_id = ref(null);
     const showConfirmationModal = ref(false);
-    const temporaryProduct = ref(null);
+    const temporaryProducts = ref([]);
     const tempProductName = ref(null);
     const tempProductPrice = ref(null);
 
@@ -246,15 +248,28 @@
     };
 
     const addTemporaryProduct = (name, price) => {
-        temporaryProduct.value = {
-            id: null, // Vous pouvez attribuer un ID temporaire si nécessaire
+        // Générer un ID temporaire unique pour chaque produit temporaire
+        const tempProductId = '_' + Math.random().toString(36).substr(2, 9);
+
+        const tempProduct = {
+            id: tempProductId,
             name: name,
             price: price,
         };
-        addToCart(temporaryProduct.value); // Ajoutez le produit temporaire au panier
+        temporaryProducts.value.push(tempProduct);
+
+        // Créer une copie du produit temporaire pour éviter les références directes
+        const productCopy = {
+            ...tempProduct
+        };
+
+        addToCart(productCopy); // Ajoutez la copie du produit temporaire au panier
         tempProductName.value = null;
         tempProductPrice.value = null;
     };
+
+
+
 
     const loadFromServer = async () => {
         await axios.get('/api/products')
@@ -338,21 +353,24 @@
     };
 
     const sendSaleData = async () => {
-        // Construction l'objet de données à envoyer au contrôleur
+        // Construction de l'objet de données à envoyer au contrôleur
         const requestData = {
             products: cart.value.map(item => ({
                 id: item.product.id,
                 quantity: item.quantity,
                 price: item.product.price
             })),
-            client_id: client_id.value, // Insére l'ID du client si nécessaire
-            total_amount: totalAmount.value, // Récupére le montant total du panier
+            client_id: client_id.value,
+            total_amount: totalAmount.value,
             cash: amountPaidCash.value,
             bancontact: amountPaidBancontact.value,
             credit_card: amountPaidCreditcard.value,
         };
 
-        // envoi de la requete au contrôleur Laravel pour la création du ticket de caisse
+        // Affichez les données à envoyer dans la console pour vérification
+        console.log('Données à envoyer:', requestData);
+
+        // envoi de la requête au contrôleur Laravel pour la création du ticket de caisse
         await axios.post('/api/sales', requestData)
             .then(response => {
                 // Réinitialiser le panier après avoir enregistré la vente
@@ -368,6 +386,7 @@
                 console.error('Erreur lors de l\'enregistrement de la vente:', error);
             });
     };
+
 
     watchEffect(() => {
         updateFilteredProducts();

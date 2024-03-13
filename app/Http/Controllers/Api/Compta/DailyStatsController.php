@@ -34,6 +34,7 @@ class DailyStatsController extends Controller
             $query->whereDate('created_at', $today);
         })->sum('total_amount');
 
+
     $saleLines = [];
     foreach ($sales as $sale) {
         $product = Product::find($sale->product_id);

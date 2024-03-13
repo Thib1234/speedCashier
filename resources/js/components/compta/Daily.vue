@@ -11,20 +11,21 @@
             <canvas ref="salesChartCanvas" width="400" height="200"></canvas>
         </div>
     </div>
-    <div class="container mx-auto">
-        <h2 class="text-3xl font-semibold mb-4">Historique des ventes du jour</h2>
-        <div class="mb-4">
-            <div v-for="vente in salesLines" :key="vente.id">
-                <p><span class="font-semibold">ID Vente:</span> {{ vente.id }}</p>
-                <p><span class="font-semibold">Total:</span> {{ vente.total }}</p>
-                <ul>
-                    <li v-for="product in vente.products" :key="product.id">
-                        {{ product.name }} - {{ product.price }}
-                    </li>
-                </ul>
-            </div>
+    <h2 class="text-3xl font-semibold mb-4">Historique des ventes du jour</h2>
+    <div class="mb-4">
+        <div v-for="vente in salesLines" :key="vente.id">
+            <p><span class="font-semibold">ID Vente:</span> {{ vente.id }}</p>
+            <p><span class="font-semibold">Total:</span> {{ vente.total }}</p>
+            <ul>
+                <li v-for="product in vente.products" :key="product.id">
+                    {{ product.name }} - {{ product.price }}
+                </li>
+            </ul>
+            <button @click="deleteSale(vente.id)"
+                class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mt-2">Supprimer</button>
         </div>
     </div>
+
 </template>
 
 <script setup>
@@ -42,7 +43,7 @@
     const totalClients = ref(0);
     const totalVentes = ref(0);
     const salesLines = ref([]);
-    
+
     onMounted(async () => {
         try {
             const response = await axios.get('/api/daily-stats');
@@ -91,9 +92,21 @@
             });
         }
     }
+    async function deleteSale(saleId) {
+        try {
+            const response = await axios.delete(`/api/sales/${saleId}`);
+            const deletedSaleId = response.data.sale_id;
+            // Mettre à jour l'affichage en supprimant la vente de la liste
+            salesLines.value = salesLines.value.filter(sale => sale.id !== deletedSaleId);
+        } catch (error) {
+            console.error('Erreur lors de la suppression de la vente:', error.response.data.message);
+        }
+    }
+
 </script>
 
 <style>
     /* Component-specific styles */
     /* You can add Tailwind CSS styles or customize as per your preference */
+
 </style>
