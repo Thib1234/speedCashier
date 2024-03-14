@@ -29,39 +29,44 @@ class SaleController extends Controller
             'client_id' => 'nullable|exists:clients,id',
             'total_amount' => 'required|numeric|min:0',
         ]);
-
+        
         $sale = new Sale();
         $sale->datetime = now();
-        $sale->client_id = $request->input('client_id');
+        if ($request->has('client_id')) {
+            $sale->client_id = $request->input('client_id');
+        }
+        
         $sale->save();
-
+    
         foreach ($request->input('products') as $product) {
-            if (isset($product['id'])) {
-                if (substr($product['id'], 0, 1) !== '_') {
-                    $productSale = new ProductSale();
-                    $prod = Product::find($product['id']);
-                    if ($prod !== null) {
-                        $prod->stock = $prod->stock - $product['quantity'];
-                        $productSale->sale_id = $sale->id;
-                        $productSale->product_id = $product['id'];
-                        $productSale->quantity = $product['quantity'];
-                        $productSale->price = $product['price'];
-                        $productSale->save();
-                        $prod->save();
-                    } else {
-                        // Gérer le cas où le produit n'existe pas dans la base de données
-                        // Par exemple, journaliser cette situation ou traiter différemment
-                    }
-                } else {
-                    // Gérer le cas où le produit est temporaire
-                    // Par exemple, le journaliser ou l'ignorer
-                }
+            // Vérifier si le produit est temporaire
+            if (substr($product['id'], 0, 1) === '_') {
+                // Créer le produit temporaire s'il n'existe pas déjà
+                $tempProduct = new Product();
+                $tempProduct->name = 'produit temporaire'; // Assurez-vous d'avoir le nom du produit dans la demande
+                $tempProduct->price = $product['price'];
+                // Autres attributs du produit temporaire peuvent être définis ici
+                $tempProduct->save();
+                
+                // Ajouter le produit temporaire à la vente
+                $productSale = new ProductSale();
+                $productSale->sale_id = $sale->id;
+                $productSale->product_id = $tempProduct->id;
+                $productSale->quantity = $product['quantity'];
+                $productSale->price = $product['price'];
+                $productSale->save();
             } else {
-                // Gérer le cas où l'ID du produit est manquant
-                // Par exemple, journaliser cette situation ou traiter différemment
+                // Si le produit n'est pas temporaire, ajoutez-le directement à la vente
+                $productSale = new ProductSale();
+                $productSale->sale_id = $sale->id;
+                $productSale->product_id = $product['id'];
+                $productSale->quantity = $product['quantity'];
+                $productSale->price = $product['price'];
+                $productSale->save();
             }
         }
-
+    
+        // Créer un nouvel enregistrement Payment pour la vente
         $payment = new Payment();
         $payment->sale_id = $sale->id;
         $payment->total_amount = $request->input('total_amount');
@@ -69,6 +74,10 @@ class SaleController extends Controller
         $payment->bancontact = $request->input('bancontact');
         $payment->credit_card = $request->input('credit_card');
         $payment->save();
+
+        // Associer le paiement à la vente
+        $sale->payment_id = $payment->id;
+        $sale->save();
 
         return response()->json(['message' => 'Vente enregistrée avec succès', 'sale_id' => $sale->id], 201);
     }

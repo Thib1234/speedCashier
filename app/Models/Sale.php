@@ -9,29 +9,36 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Client;
 use App\Models\Payment;
+use App\Models\Product;
+use App\Models\ProductSale;
 
 class Sale extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'datetime',
+        'client_id',
+    ];
+    public function productSales(): HasMany
+    {
+        return $this->hasMany(ProductSale::class);
+    }
+
 
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
     }
 
-    protected $fillable = [
-        'datetime',
-        'client_id',
-    ];
-
-    public function products(): BelongsToMany
-    {
-        return $this->belongsToMany(Product::class)
-            ->withPivot('quantity', 'tax_amount');
-    }
-
     public function payment(): HasOne
     {
         return $this->hasOne(Payment::class);
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'product_sale')
+            ->withPivot('quantity', 'price');
     }
 }

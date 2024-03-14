@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Sale;
 use App\Models\Product;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 
 
@@ -18,7 +18,6 @@ class ProductSale extends Model
         'product_id',
         'quantity',
         'price',
-        'tax_amount',
     ];
 
     // Relation Many-to-One avec le modèle Sale
