@@ -16,6 +16,7 @@ class Product extends Model
         'price',
         'stock',
         'purchase_price',
+        'active'
     ];
 
     public function sales(): BelongsToMany

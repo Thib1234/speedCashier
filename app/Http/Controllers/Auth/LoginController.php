@@ -35,7 +35,7 @@ class LoginController extends Controller
         }
 
         // dd('il est ' . $date);
-        return redirect()->route('auth.login')->withErrors([
+        return redirect()->route('index')->withErrors([
             'name' => 'erreur dans le nom'
         ])->onlyInput('name');
     }
@@ -43,6 +43,6 @@ class LoginController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect()->route('auth.login');
+        return redirect()->route('index');
     }
 }

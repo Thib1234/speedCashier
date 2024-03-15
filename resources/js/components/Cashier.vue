@@ -484,7 +484,7 @@ const addTemporaryProduct = (name, price) => {
 
 const loadFromServer = async () => {
     await axios
-        .get("/api/products")
+        .get("/api/productsShow")
         .then((res) => (products.value = res.data.data))
         .catch((e) => console.log(e));
     await axios

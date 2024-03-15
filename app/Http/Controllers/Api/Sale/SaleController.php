@@ -32,10 +32,7 @@ class SaleController extends Controller
         
         $sale = new Sale();
         $sale->datetime = now();
-        if ($request->has('client_id')) {
-            $sale->client_id = $request->input('client_id');
-        }
-        
+        $sale->client_id = $request->input('client_id');
         $sale->save();
     
         foreach ($request->input('products') as $product) {
