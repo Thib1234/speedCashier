@@ -1,6 +1,5 @@
 import './bootstrap';
 import { createApp } from 'vue'
-// import CreateUser from './components/users/CreateUser.vue'
 import CreateProduct from './components/products/CreateProduct.vue'
 import ProductsList from './components/products/ProductsList.vue'
 import ClientsList from './components/clients/ClientsList.vue'
@@ -13,7 +12,6 @@ import Stats from './components/compta/Stats.vue'
 const app = createApp({});
 
 app.component('Heading', Heading);
-// app.component('CreateUser', CreateUser);
 app.component('cashier', Cashier);
 app.component('CreateProduct', CreateProduct);
 app.component('ProductsList', ProductsList);

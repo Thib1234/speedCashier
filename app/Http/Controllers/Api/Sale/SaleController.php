@@ -52,11 +52,10 @@ class SaleController extends Controller
                 $productSale->quantity = $product['quantity'];
                 $productSale->price = $product['price'];
                 $productSale->save();
-            } else {
+            } else { // Si le produit n'est pas temporaire
                 $prod = Product::find($product['id']);
-                $prod->stock = $prod->stock - $product['quantity'];
+                $prod->stock = $prod->stock - $product['quantity']; // ajustement du stock en fonction de la vente
 
-                // Si le produit n'est pas temporaire, ajoutez-le directement à la vente
                 $productSale = new ProductSale();
                 $productSale->sale_id = $sale->id;
                 $productSale->product_id = $product['id'];

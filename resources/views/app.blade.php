@@ -13,18 +13,20 @@
         <form action="{{ route('auth.logout') }}" method="post">
             @method("delete")
             @csrf
-            <button>Se déconnecter</button>
+            <button
+                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-110">
+                Se déconnecter
+            </button>
         </form>
+
         <heading></heading>
 
         @endauth
         @guest
         <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
             <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-                <img class="mx-auto h-10 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                    alt="Your Company" />
-                <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your
-                    account</h2>
+                <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Se connecter
+                </h2>
             </div>
 
             <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -64,8 +66,6 @@
         @endguest
 
         @yield('content')
-
-        {{-- Faire une nouvelle page vierge de login.blade.php pour sans utiliser le extends pour pouvoir tout proteger avec un seul et unique --}}
 
     </div>
 </body>

@@ -1,46 +1,72 @@
 <template>
-    <div class="container mx-auto">
+    <div class="container mx-auto p-6 bg-white shadow-lg rounded-lg">
         <!-- Statistiques de ventes -->
-        <h2 class="text-3xl font-semibold mb-4">Statistiques de ventes pour aujourd'hui</h2>
-        <div class="mb-4">
-            <p><span class="font-semibold">Total des ventes:</span> {{ totalSales }}</p>
-            <p><span class="font-semibold">Nombre de clients:</span> {{ totalClients }}</p>
-            <p><span class="font-semibold">Montant total:</span> {{ totalPayments }}</p>
+        <h2 class="text-4xl font-bold text-gray-800 mb-6">Statistiques de ventes pour aujourd'hui</h2>
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="p-4 bg-blue-100 rounded-lg shadow">
+                <p class="font-semibold text-gray-700">Total des ventes:</p>
+                <p class="text-xl">{{ totalSales }}</p>
+            </div>
+            <div class="p-4 bg-green-100 rounded-lg shadow">
+                <p class="font-semibold text-gray-700">Nombre de clients:</p>
+                <p class="text-xl">{{ totalClients }}</p>
+            </div>
+            <div class="p-4 bg-red-100 rounded-lg shadow">
+                <p class="font-semibold text-gray-700">Montant total:</p>
+                <p class="text-xl">{{ totalPayments }}€</p>
+            </div>
         </div>
 
         <!-- Chargement en cours ou graphique -->
-        <div v-if="loading" class="text-gray-600">Chargement en cours...</div>
+        <div v-if="loading" class="animate-pulse text-gray-600">Chargement en cours...</div>
         <div v-else>
-            <canvas ref="salesChartCanvas" width="400" height="200"></canvas>
+            <canvas ref="salesChartCanvas" class="w-full h-64"></canvas>
         </div>
 
         <!-- Lignes de vente -->
-
-        <div class="mt-8">
-            <h2 class="text-3xl font-semibold mb-4">Lignes de vente du jour</h2>
-            <div v-if="salesLines.length === 0">
+        <div class="mt-10">
+            <h2 class="text-4xl font-bold text-gray-800 mb-6">Lignes de vente du jour</h2>
+            <div v-if="salesLines.length === 0" class="text-gray-600">
                 <p>Aucune vente pour aujourd'hui.</p>
             </div>
             <div v-else>
-                <div v-for="sale in sales" :key="sale.id" class="border p-4 mb-4">
-
-                    Numéro de la vente {{ sale.id }}
-                    <div v-for="test in sale.products" key="test.id">
-                        <p>Nom du Produit : {{ test.name }}</p>
-                        <p>Prix du produit : {{ test.price }} €</p>
+                <div v-for="sale in sales" :key="sale.id" class="p-6 mb-4 bg-gray-50 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Numéro de la vente: {{ sale.id }}</h3>
+                    <div v-for="product in sale.products" :key="product.id" class="mb-2">
+                        <p class="font-semibold text-gray-700">Nom du Produit:</p>
+                        <p>{{ product.name }}</p>
+                        <p class="font-semibold text-gray-700">Prix du produit:</p>
+                        <p>{{ product.price }}€</p>
                     </div>
-                    <p><span class="font-semibold">Montant total de la vente:</span> {{ sale.payment.total_amount }} €</p>
-                    {{ sale.payment.cash }}
-                    {{ sale.payment.bancontact }}
-                    {{ sale.payment.credit_card }}
-                    {{ sale.payment.virement }}
-                    
-                    <button @click="deleteSale(sale.id)" class="bg-red-500 text-white px-4 py-2 mt-2">Supprimer la vente</button>
+                    <div class="mt-4">
+                        <h4 class="text-md font-semibold text-gray-800 mb-2">Détails du paiement:</h4>
+                        <div v-if="sale.payment.cash" class="flex items-center space-x-2">
+                            <span class="font-medium">Espèces:</span>
+                            <span>{{ sale.payment.cash }}€</span>
+                        </div>
+                        <div v-if="sale.payment.bancontact" class="flex items-center space-x-2">
+                            <span class="font-medium">Bancontact:</span>
+                            <span>{{ sale.payment.bancontact }}€</span>
+                        </div>
+                        <div v-if="sale.payment.credit_card" class="flex items-center space-x-2">
+                            <span class="font-medium">Carte de crédit:</span>
+                            <span>{{ sale.payment.credit_card }}€</span>
+                        </div>
+                        <div v-if="sale.payment.virement" class="flex items-center space-x-2">
+                            <span class="font-medium">Virement:</span>
+                            <span>{{ sale.payment.virement }}€</span>
+                        </div>
+                    </div>
+                    <button @click="deleteSale(sale.id)"
+                        class="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Supprimer
+                        la vente</button>
                 </div>
             </div>
         </div>
     </div>
 </template>
+
+
 
 
 <script setup>
