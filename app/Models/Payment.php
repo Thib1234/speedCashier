@@ -18,6 +18,7 @@ class Payment extends Model
         'cash',
         'bancontact',
         'credit_card',
+        'virement',
     ];
     
 

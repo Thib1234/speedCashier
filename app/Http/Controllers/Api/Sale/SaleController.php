@@ -41,9 +41,9 @@ class SaleController extends Controller
         foreach ($request->input('products') as $product) {
             // Vérifier si le produit est temporaire
             if (substr($product['id'], 0, 1) === '_') {
-                // Créer le produit temporaire s'il n'existe pas déjà
+                //Créer le produit temporaire s'il n'existe pas déjà
                 $tempProduct = new Product();
-                $tempProduct->name = 'produit temporaire'; // Assurez-vous d'avoir le nom du produit dans la demande
+                $tempProduct->name = $product['name']; // Assurez-vous d'avoir le nom du produit dans la demande
                 $tempProduct->price = $product['price'];
                 // Autres attributs du produit temporaire peuvent être définis ici
                 $tempProduct->save();
@@ -73,6 +73,7 @@ class SaleController extends Controller
         $payment->cash = $request->input('cash');
         $payment->bancontact = $request->input('bancontact');
         $payment->credit_card = $request->input('credit_card');
+        $payment->virement = $request->input('virement');
         $payment->save();
 
         // Associer le paiement à la vente

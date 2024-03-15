@@ -30,6 +30,10 @@
                         <p>Prix du produit : {{ test.price }} €</p>
                     </div>
                     <p><span class="font-semibold">Montant total de la vente:</span> {{ sale.payment.total_amount }} €</p>
+                    {{ sale.payment.cash }}
+                    {{ sale.payment.bancontact }}
+                    {{ sale.payment.credit_card }}
+                    {{ sale.payment.virement }}
                     
                     <button @click="deleteSale(sale.id)" class="bg-red-500 text-white px-4 py-2 mt-2">Supprimer la vente</button>
                 </div>
