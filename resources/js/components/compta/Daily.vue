@@ -11,10 +11,10 @@
                 <p class="font-semibold text-gray-700">Nombre de clients:</p>
                 <p class="text-xl">{{ totalClients }}</p>
             </div>
-            <div class="p-4 bg-red-100 rounded-lg shadow">
+            <!-- <div class="p-4 bg-red-100 rounded-lg shadow">
                 <p class="font-semibold text-gray-700">Montant total:</p>
                 <p class="text-xl">{{ totalPayments }}€</p>
-            </div>
+            </div> -->
         </div>
 
         <!-- Chargement en cours ou graphique -->
@@ -40,7 +40,7 @@
                     </div>
                     <div class="mt-4">
                         <h4 class="text-md font-semibold text-gray-800 mb-2">Détails du paiement:</h4>
-                        <div v-if="sale.payment.cash" class="flex items-center space-x-2">
+                        <!-- <div v-if="sale.payment.cash" class="flex items-center space-x-2">
                             <span class="font-medium">Espèces:</span>
                             <span>{{ sale.payment.cash }}€</span>
                         </div>
@@ -55,7 +55,7 @@
                         <div v-if="sale.payment.virement" class="flex items-center space-x-2">
                             <span class="font-medium">Virement:</span>
                             <span>{{ sale.payment.virement }}€</span>
-                        </div>
+                        </div> -->
                     </div>
                     <button @click="deleteSale(sale.id)"
                         class="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Supprimer
@@ -79,7 +79,7 @@
     let salesChart = null;
     const totalSales = ref(0);
     const totalClients = ref(0);
-    const totalPayments = ref(0);
+
     const salesLines = ref([]);
     const sales = ref([]);
 
@@ -89,7 +89,7 @@
             const data = response.data;
             totalSales.value = data.total_sales;
             totalClients.value = data.total_clients;
-            totalPayments.value = data.total_payments;
+            
             salesLines.value = data.sale_lines;
             sales.value = data.sales;
             await nextTick();

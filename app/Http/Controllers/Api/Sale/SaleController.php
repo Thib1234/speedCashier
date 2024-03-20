@@ -33,6 +33,11 @@ class SaleController extends Controller
         $sale = new Sale();
         $sale->datetime = now();
         $sale->client_id = $request->input('client_id');
+        $sale->total_amount = $request->input('total_amount');
+        $sale->cash = $request->input('cash');
+        $sale->bancontact = $request->input('bancontact');
+        $sale->credit_card = $request->input('credit_card');
+        $sale->virement = $request->input('virement');
         $sale->save();
     
         foreach ($request->input('products') as $product) {
@@ -67,18 +72,18 @@ class SaleController extends Controller
         }
     
         // Créer un nouvel enregistrement Payment pour la vente
-        $payment = new Payment();
-        $payment->sale_id = $sale->id;
-        $payment->total_amount = $request->input('total_amount');
-        $payment->cash = $request->input('cash');
-        $payment->bancontact = $request->input('bancontact');
-        $payment->credit_card = $request->input('credit_card');
-        $payment->virement = $request->input('virement');
-        $payment->save();
+        // $payment = new Payment();
+        // $payment->sale_id = $sale->id;
+        // $payment->total_amount = $request->input('total_amount');
+        // $payment->cash = $request->input('cash');
+        // $payment->bancontact = $request->input('bancontact');
+        // $payment->credit_card = $request->input('credit_card');
+        // $payment->virement = $request->input('virement');
+        // $payment->save();
 
         // Associer le paiement à la vente
-        $sale->payment_id = $payment->id;
-        $sale->save();
+        // $sale->payment_id = $payment->id;
+        // $sale->save();
 
         return response()->json(['message' => 'Vente enregistrée avec succès', 'sale_id' => $sale->id], 201);
     }

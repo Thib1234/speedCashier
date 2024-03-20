@@ -20,7 +20,7 @@ class DailyStatsController extends Controller
         $today = now()->format('Y-m-d');
         // $sales = Sale::whereDate('created_at', $today)->get();
 
-        $sales = Sale::whereDate('created_at', $today)->with('products', 'client', 'payment')->get();
+        $sales = Sale::whereDate('created_at', $today)->with('products', 'client')->get();
          //dd($sale);
         // Nombre total de ventes du jour
         $totalSales = Sale::whereDate('created_at', $today)->count();
@@ -32,9 +32,9 @@ class DailyStatsController extends Controller
         })->count();
 
         // Montant total des paiements pour aujourd'hui
-        $totalPayments = Payment::whereHas('sale', function ($query) use ($today) {
-            $query->whereDate('created_at', $today);
-        })->sum('total_amount');
+        // $totalPayments = Payment::whereHas('sale', function ($query) use ($today) {
+        //     $query->whereDate('created_at', $today);
+        // })->sum('total_amount');
 
 
     $saleLines = [];
@@ -69,7 +69,7 @@ class DailyStatsController extends Controller
         return response()->json([
             'total_sales' => $totalSales,
             'total_clients' => $totalClients,
-            'total_payments' => $totalPayments,
+            // 'total_payments' => $totalPayments,
             'sale_lines' => $saleLines,
             'sales' => $sales,
         ]);

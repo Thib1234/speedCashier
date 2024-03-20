@@ -18,6 +18,11 @@ class Sale extends Model
 
     protected $fillable = [
         'datetime',
+        'cash',
+        'bancontact',
+        'credit_card',
+        'virement',
+        'total_amount',
         'client_id',
     ];
     public function productSales(): HasMany
