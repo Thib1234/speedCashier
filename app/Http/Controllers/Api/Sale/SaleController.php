@@ -56,35 +56,21 @@ class SaleController extends Controller
                 $productSale->product_id = $tempProduct->id;
                 $productSale->quantity = $product['quantity'];
                 $productSale->price = $product['price'];
+                $productSale->total = $product['price'] * $product['quantity'];
                 $productSale->save();
             } else { // Si le produit n'est pas temporaire
                 $prod = Product::find($product['id']);
                 $prod->stock = $prod->stock - $product['quantity']; // ajustement du stock en fonction de la vente
-
                 $productSale = new ProductSale();
                 $productSale->sale_id = $sale->id;
                 $productSale->product_id = $product['id'];
                 $productSale->quantity = $product['quantity'];
                 $productSale->price = $product['price'];
+                $productSale->total = $product['price'] * $product['quantity'];
                 $productSale->save();
                 $prod->save();
             }
         }
-    
-        // Créer un nouvel enregistrement Payment pour la vente
-        // $payment = new Payment();
-        // $payment->sale_id = $sale->id;
-        // $payment->total_amount = $request->input('total_amount');
-        // $payment->cash = $request->input('cash');
-        // $payment->bancontact = $request->input('bancontact');
-        // $payment->credit_card = $request->input('credit_card');
-        // $payment->virement = $request->input('virement');
-        // $payment->save();
-
-        // Associer le paiement à la vente
-        // $sale->payment_id = $payment->id;
-        // $sale->save();
-
         return response()->json(['message' => 'Vente enregistrée avec succès', 'sale_id' => $sale->id], 201);
     }
 }

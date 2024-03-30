@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('sale_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
             $table->decimal('price', 8, 2); // Ajoutez une colonne pour le prix
+            $table->decimal('total', 8, 2); // Ajoutez une colonne pour le prix
             $table->timestamps();
         
             // $table->foreign('sale_id')->references('id')->on('sales')->onDelete('cascade');

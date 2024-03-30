@@ -95,6 +95,8 @@
             await nextTick();
             loading.value = false;
             renderChart(data);
+            console.log(salesLines.value);
+            console.log(sales.value);
         } catch (error) {
             if (error.response) {
                 console.error('Error fetching sales:', error.response.data);

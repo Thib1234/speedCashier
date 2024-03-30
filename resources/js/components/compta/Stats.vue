@@ -12,20 +12,19 @@
         <div v-else>
             <canvas ref="salesChartCanvas" width="400" height="200"></canvas>
         </div>
-        <h2>
-            <div v-if="daily">
-                {{daily[0].date}}
+        <h2 v-if="total_sales">
+            TOTAL : {{ total_sales }} €
+            du {{ startDate }} au {{ endDate }}
+        </h2>
+        <!-- <div v-for="sale in sales" :key="sale.id" class="p-6 mb-4 bg-gray-50 rounded-lg shadow">
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Numéro de la vente: {{ sale.id }}</h3>
+            <div v-for="product in sale.products" :key="product.id" class="mb-2">
+                <p class="font-semibold text-gray-700">Nom du Produit:</p>
+                <p>{{ product.name }}</p>
+                <p class="font-semibold text-gray-700">Prix du produit:</p>
+                <p>{{ product.price }}€</p>
             </div>
-            
-            <div v-for="sale in sales" :key="sale.id" class="p-6 mb-4 bg-gray-50 rounded-lg shadow">
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">Numéro de la vente: {{ sale.id }}</h3>
-                <div v-for="product in sale.products" :key="product.id" class="mb-2">
-                    <p class="font-semibold text-gray-700">Nom du Produit:</p>
-                    <p>{{ product.name }}</p>
-                    <p class="font-semibold text-gray-700">Prix du produit:</p>
-                    <p>{{ product.price }}€</p>
-                </div>
-                <div class="mt-4">
+            <!-- <div class="mt-4">
                     <h4 class="text-md font-semibold text-gray-800 mb-2">Détails du paiement:</h4>
                     <div v-if="sale.payment.cash" class="flex items-center space-x-2">
                         <span class="font-medium">Espèces:</span>
@@ -43,12 +42,51 @@
                         <span class="font-medium">Virement:</span>
                         <span>{{ sale.payment.virement }}€</span>
                     </div>
-                </div>
-                <button @click="deleteSale(sale.id)"
-                    class="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Supprimer
-                    la vente</button>
+                </div> 
+            <button @click="deleteSale(sale.id)"
+                class="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Supprimer
+                la vente</button>
+        </div> -->
+        <div v-for="sale in sales" :key="sale.id" class="p-6 mb-4 bg-gray-50 rounded-lg shadow">
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Numéro de la vente: {{ sale.id }}</h3>
+            <div v-for="product in sale.products" :key="product.id" class="mb-2">
+                <p class="font-semibold text-gray-700">Nom du Produit:</p>
+                <p>{{ product.name }}</p>
+                <p class="font-semibold text-gray-700">Prix du produit:</p>
+                <p>{{ product.price }}€</p>
+                <p class="font-semibold text-gray-700">Quantité:</p>
+                {{ product.pivot.quantity }}
+                <p class="font-semibold text-gray-700">Total:</p>
+
+                {{ product.pivot.total }}
             </div>
-        </h2>
+            <div>
+                Total de la vente
+                : {{ sale.total_amount }}
+            </div>
+            <!-- <div class="mt-4">
+                    <h4 class="text-md font-semibold text-gray-800 mb-2">Détails du paiement:</h4>
+                    <div v-if="sale.payment.cash" class="flex items-center space-x-2">
+                        <span class="font-medium">Espèces:</span>
+                        <span>{{ sale.payment.cash }}€</span>
+                    </div>
+                    <div v-if="sale.payment.bancontact" class="flex items-center space-x-2">
+                        <span class="font-medium">Bancontact:</span>
+                        <span>{{ sale.payment.bancontact }}€</span>
+                    </div>
+                    <div v-if="sale.payment.credit_card" class="flex items-center space-x-2">
+                        <span class="font-medium">Carte de crédit:</span>
+                        <span>{{ sale.payment.credit_card }}€</span>
+                    </div>
+                    <div v-if="sale.payment.virement" class="flex items-center space-x-2">
+                        <span class="font-medium">Virement:</span>
+                        <span>{{ sale.payment.virement }}€</span>
+                    </div>
+                </div> -->
+            <button @click="deleteSale(sale.id)"
+                class="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Supprimer
+                la vente</button>
+        </div>
     </div>
 </template>
 
@@ -68,6 +106,7 @@
     const salesLines = ref([]);
     const sales = ref([]);
     const daily = ref(null);
+    const total_sales = ref(null);
 
     const fetchStats = async () => {
         if (!startDate.value || !endDate.value) {
@@ -85,6 +124,8 @@
             sales.value = data.sales;
             salesLines.value = data.sale_lines;
             daily.value = data.dailyTotal;
+            total_sales.value = data.total_sales;
+            console.log(sales.value);
             renderChart(statsData.value);
         } catch (error) {
             console.error('Erreur lors de la récupération des statistiques :', error);
@@ -162,4 +203,5 @@
             console.error('Erreur lors de la suppression de la vente:', error.response);
         }
     }
+
 </script>

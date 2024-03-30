@@ -18,6 +18,7 @@ class ProductSale extends Model
         'product_id',
         'quantity',
         'price',
+        'total',
     ];
 
     // Relation Many-to-One avec le modèle Sale
