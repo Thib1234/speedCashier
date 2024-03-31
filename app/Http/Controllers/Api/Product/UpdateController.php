@@ -20,6 +20,7 @@ class UpdateController extends Controller
 			'stock' => 'nullable|integer',
 			'purchase_price' => 'nullable|numeric',
 			'price' => 'required|numeric',
+			'category_id' => 'integer',
 		]);
 
 		$product->update($validatedData);

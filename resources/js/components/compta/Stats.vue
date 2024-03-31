@@ -16,77 +16,15 @@
             TOTAL : {{ total_sales }} €
             du {{ startDate }} au {{ endDate }}
         </h2>
-        <!-- <div v-for="sale in sales" :key="sale.id" class="p-6 mb-4 bg-gray-50 rounded-lg shadow">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Numéro de la vente: {{ sale.id }}</h3>
-            <div v-for="product in sale.products" :key="product.id" class="mb-2">
-                <p class="font-semibold text-gray-700">Nom du Produit:</p>
-                <p>{{ product.name }}</p>
-                <p class="font-semibold text-gray-700">Prix du produit:</p>
-                <p>{{ product.price }}€</p>
-            </div>
-            <!-- <div class="mt-4">
-                    <h4 class="text-md font-semibold text-gray-800 mb-2">Détails du paiement:</h4>
-                    <div v-if="sale.payment.cash" class="flex items-center space-x-2">
-                        <span class="font-medium">Espèces:</span>
-                        <span>{{ sale.payment.cash }}€</span>
-                    </div>
-                    <div v-if="sale.payment.bancontact" class="flex items-center space-x-2">
-                        <span class="font-medium">Bancontact:</span>
-                        <span>{{ sale.payment.bancontact }}€</span>
-                    </div>
-                    <div v-if="sale.payment.credit_card" class="flex items-center space-x-2">
-                        <span class="font-medium">Carte de crédit:</span>
-                        <span>{{ sale.payment.credit_card }}€</span>
-                    </div>
-                    <div v-if="sale.payment.virement" class="flex items-center space-x-2">
-                        <span class="font-medium">Virement:</span>
-                        <span>{{ sale.payment.virement }}€</span>
-                    </div>
-                </div> 
-            <button @click="deleteSale(sale.id)"
-                class="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Supprimer
-                la vente</button>
-        </div> -->
-        <div v-for="sale in sales" :key="sale.id" class="p-6 mb-4 bg-gray-50 rounded-lg shadow">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Numéro de la vente: {{ sale.id }}</h3>
-            <div v-for="product in sale.products" :key="product.id" class="mb-2">
-                <p class="font-semibold text-gray-700">Nom du Produit:</p>
-                <p>{{ product.name }}</p>
-                <p class="font-semibold text-gray-700">Prix du produit:</p>
-                <p>{{ product.price }}€</p>
-                <p class="font-semibold text-gray-700">Quantité:</p>
-                {{ product.pivot.quantity }}
-                <p class="font-semibold text-gray-700">Total:</p>
+        <div v-for="sale in sales" :key="sale.id" class="p-2 mb-2 bg-gray-50 rounded-lg shadow">
+    <h3 class="text-sm font-semibold text-gray-800 mb-1">Vente: {{ sale.id }}</h3>
+    <div v-for="product in sale.products" :key="product.id" class="mb-1">
+        <p class="text-sm font-semibold text-gray-700">Produit: {{ product.name }}, Prix: {{ product.price }}€, Quantité: {{ product.pivot.quantity }}, Total: {{ product.pivot.total }}€</p>
+    </div>
+    <p class="text-sm font-semibold text-gray-700">Total de la vente: {{ sale.total_amount }}€</p>
+    <button @click="deleteSale(sale.id)" class="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-sm">Supprimer</button>
+</div>
 
-                {{ product.pivot.total }}
-            </div>
-            <div>
-                Total de la vente
-                : {{ sale.total_amount }}
-            </div>
-            <!-- <div class="mt-4">
-                    <h4 class="text-md font-semibold text-gray-800 mb-2">Détails du paiement:</h4>
-                    <div v-if="sale.payment.cash" class="flex items-center space-x-2">
-                        <span class="font-medium">Espèces:</span>
-                        <span>{{ sale.payment.cash }}€</span>
-                    </div>
-                    <div v-if="sale.payment.bancontact" class="flex items-center space-x-2">
-                        <span class="font-medium">Bancontact:</span>
-                        <span>{{ sale.payment.bancontact }}€</span>
-                    </div>
-                    <div v-if="sale.payment.credit_card" class="flex items-center space-x-2">
-                        <span class="font-medium">Carte de crédit:</span>
-                        <span>{{ sale.payment.credit_card }}€</span>
-                    </div>
-                    <div v-if="sale.payment.virement" class="flex items-center space-x-2">
-                        <span class="font-medium">Virement:</span>
-                        <span>{{ sale.payment.virement }}€</span>
-                    </div>
-                </div> -->
-            <button @click="deleteSale(sale.id)"
-                class="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Supprimer
-                la vente</button>
-        </div>
     </div>
 </template>
 
@@ -107,6 +45,7 @@
     const sales = ref([]);
     const daily = ref(null);
     const total_sales = ref(null);
+    const salesByDay = ref(null);
 
     const fetchStats = async () => {
         if (!startDate.value || !endDate.value) {
@@ -125,7 +64,9 @@
             salesLines.value = data.sale_lines;
             daily.value = data.dailyTotal;
             total_sales.value = data.total_sales;
+            salesByDay.value = data.salesByDay;
             console.log(sales.value);
+            console.log(salesByDay.value);
             renderChart(statsData.value);
         } catch (error) {
             console.error('Erreur lors de la récupération des statistiques :', error);
@@ -133,60 +74,54 @@
     };
 
     function renderChart(data) {
-        if (salesChart) {
-            salesChart.destroy();
-        }
-        const ctx = salesChartCanvas.value.getContext('2d');
-        salesChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['iss', 'Nombre de clients', 'Montant total des paiements'],
-                datasets: [{
-                    label: 'Statistiques',
-                    data: [data.total_sales, data.total_clients, data.total_payments],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function (value) {
-                                return value + ' €';
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                var label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += context.parsed.y.toFixed(2) + ' €';
-                                }
-                                return label;
-                            }
-                        }
+    if (salesChart) {
+        salesChart.destroy();
+    }
+
+    const ctx = salesChartCanvas.value.getContext('2d');
+salesChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: Object.keys(data.salesByDay), // Utiliser les dates comme étiquettes
+        datasets: [{
+            label: 'Total des ventes par jour',
+            data: Object.values(data.salesByDay), // Utiliser les totaux des ventes par jour comme données
+            backgroundColor: 'rgba(54, 162, 235, 0.6)', // Couleur de remplissage plus douce
+            borderColor: 'rgba(54, 162, 235, 1)', // Couleur de la bordure
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function (value) {
+                        return value + ' €';
                     }
                 }
             }
-        });
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        var label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                            label += context.parsed.y.toFixed(2) + ' €';
+                        }
+                        return label;
+                    }
+                }
+            }
+        }
     }
+});
+    }
+
 
     onMounted(() => {
         fetchStats();

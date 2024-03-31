@@ -4,19 +4,23 @@ namespace App\Http\Controllers\Api\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductCollection;
+use App\Http\Resources\CategoryCollection;
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class IndexController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
+
     public function __invoke(Request $request)
     {
-        return new ProductCollection(
-            resource: Product::all(),
-        );
+        $products = Product::all();
+        $categories = Category::all();
+
+        return response()->json([
+            'products' => new ProductCollection($products),
+            'categories' => new CategoryCollection($categories),
+        ]);
     }
 }

@@ -7,7 +7,8 @@
                     <div class="mb-4">
                         <div class="grid grid-cols-2">
                             <label for="name" class="block text-lg font-semibold mb-2">Nom du produit:</label>
-                            <button type="button" class="flex justify-between items-center" @click="toggleActiveProduct(product)">
+                            <button type="button" class="flex justify-between items-center"
+                                @click="toggleActiveProduct(product)">
                                 <div class="w-16 h-10 flex items-center bg-gray-300 rounded-full p-1 duration-300 ease-in-out"
                                     :class="{ 'bg-green-400': product.active === 1 }">
                                     <div class="bg-white w-8 h-8 rounded-full shadow-md transform duration-300 ease-in-out"
@@ -36,6 +37,15 @@
                             class="border-b border-gray-400 focus:outline-none rounded-lg px-4 py-2 w-full" step=".01"
                             type="number">
                     </div>
+                    <div class="mb-4">
+                        <label for="category" class="block text-lg font-semibold mb-2">Catégorie:</label>
+                        <select v-model="product.category_id" id="category"
+                            class="border-b border-gray-400 focus:outline-none rounded-lg px-4 py-2 w-full">
+                            <option value="" disabled>Sélectionner une catégorie</option>
+                            <option v-for="category in categories" :key="category.id" :value="category.id">
+                                {{ category.name }}</option>
+                        </select>
+                    </div>
                     <button type="submit"
                         class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Enregistrer</button>
                 </form>
@@ -45,15 +55,27 @@
 </template>
 
 <script setup>
-    import { ref } from "vue";
+    import {
+        ref
+    } from "vue";
     const products = ref([]);
+    const categories = ref([]);
     const loadFromServer = async () => {
         try {
             const response = await axios.get('/api/products');
-            products.value = response.data.data;
+            products.value = response.data.products
+                .data; // Accédez directement à la propriété 'products' de la réponse
+            categories.value = response.data.categories.data;
+            console.log(products.value);
+            console.log(categories.value);
         } catch (error) {
             console.error(error);
         }
+    };
+
+    const getCategoryName = (categoryId) => {
+        const category = categories.value.find(cat => cat.id === categoryId);
+        return category ? category.name : '';
     };
     const updateProduct = async (product) => {
         try {
@@ -77,6 +99,7 @@
     };
 
     loadFromServer();
+
 </script>
 
 <style scoped>
@@ -107,4 +130,5 @@
     button:hover {
         opacity: 0.8;
     }
+
 </style>

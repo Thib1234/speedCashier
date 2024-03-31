@@ -35,12 +35,6 @@ class Sale extends Model
     {
         return $this->belongsTo(Client::class);
     }
-
-    public function payment(): HasOne
-    {
-        return $this->hasOne(Payment::class);
-    }
-
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_sale')

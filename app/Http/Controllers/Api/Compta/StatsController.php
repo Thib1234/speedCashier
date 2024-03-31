@@ -19,6 +19,7 @@ class StatsController extends Controller
 
         $startDate = $request->input('start');
         $endDate = $request->input('end');
+        $salesByDay = [];
 
         $sales = Sale::whereDate('created_at', '>=',$startDate)->with('products', 'client')
             ->whereDate('created_at', '<=', $endDate)
@@ -35,33 +36,39 @@ class StatsController extends Controller
                 ->whereDate('created_at', '<=', $endDate);
         })->count();
 
-        //// BLOQUE DE CODE POUR RECUPERER CHAQUE SOMME TOTALES DES VENTES PAR JOUR
+        
+
+        // Récupération des ventes par jour
+        $sales = Sale::whereDate('created_at', '>=',$startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->with('products', 'client')
+            ->get();
+
+        // Calcul du total des ventes par jour
+        foreach ($sales as $sale) {
+            $date = $sale->created_at->toDateString();
+            if (!isset($salesByDay[$date])) {
+                $salesByDay[$date] = 0;
+            }
+            $salesByDay[$date] += $sale->total_amount;
+        }
+
+        // Remplir les jours sans ventes avec un total de 0
         $period = new DatePeriod(
             new DateTime($startDate),
             new DateInterval('P1D'),
             (new DateTime($endDate))->modify('+1 day')
         );
 
-        // $dailyTotals = [];
-        // foreach ($period as $date) {
-        //     $dateKey = $date->format('Y-m-d');
-
-        //     $totalAmount = Payment::whereHas('sale', function ($query) use ($dateKey) {
-        //         $query->whereDate('created_at', '=', $dateKey);
-        //     })->sum('total_amount');
-        //     $dailyTotals[] = ['date' => $dateKey,
-        //     'total_amount' => $totalAmount];
-        // }
-        ////////// FIN DU BLOC DE CODE
-        $dailyTotals = [];
         foreach ($period as $date) {
-            $dateKey = $date->format('Y-m-d');
-
-            $totalAmount = Sale::whereHas('product', function ($query) use ($dateKey) {
-                $query->whereDate('created_at', '=', $dateKey);
-            })->sum('total_amount');
-            $dailyTotals[] = ['date' => $dateKey, 'total_amount' => $totalAmount]
+            $dateString = $date->format('Y-m-d');
+            if (!isset($salesByDay[$dateString])) {
+                $salesByDay[$dateString] = 0;
+            }
         }
+
+        // Trier le tableau par date
+        ksort($salesByDay);
 
     $saleLines = [];
     foreach ($sales as $sale) {
@@ -97,6 +104,7 @@ class StatsController extends Controller
             'total_clients' => $totalClients,
             'sale_lines' => $saleLines,
             'sales' => $sales,
+            'salesByDay' => $salesByDay,
             // 'dailyTotal' => $dailyTotals,
         ]);
     }
