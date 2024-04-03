@@ -207,6 +207,9 @@ class ShowStatsController extends Controller
 		// 	'startDate' => $startDate, // Ajoutez les valeurs de startDate et endDate à la vue
 		// 	'endDate' => $endDate,
         // ]);
+        // $salesData = new \stdClass();
+        // $salesData->totalSalesHtva = $totalSalesHtva;
+        // $salesData->amountTva = $totalHtva;
 
 		return view('compta.show', [
 			'total_sales' => $totalSales,
@@ -216,10 +219,8 @@ class ShowStatsController extends Controller
 			'salesByDay' => $salesByDay,
 			'startDate' => $startDate, // Ajoutez les valeurs de startDate et endDate à la vue
 			'endDate' => $endDate,
-            'salesData' => [
-                'totalSalesHtva' => $totalSalesHtva,
-                'amountTva' => $totalHtva,
-            ],
+            'totalSalesHtva' => $totalSalesHtva,
+            'totalHtva' => $totalHtva,
 		]);
 	}
 

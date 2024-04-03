@@ -1,37 +1,41 @@
 <template>
-    <div class="bg-white p-4 rounded-lg shadow-md">
-
-        {{ data }}
-        {{ salesData }}
-
-        <div v-for="stat in data" :key="stat.id" class="mb-4">
-            <div class="font-semibold mb-1">Cash : {{ stat.cash }}</div>
-            <div class="text-sm text-gray-600">Bancontact : {{ stat.bancontact }}</div>
-            <div class="text-sm text-gray-600">Carte de crédit : {{ stat.credit_card }}</div>
-            <div class="text-sm text-gray-600">Virement : {{ stat.virement }}</div>
-            <div v-for="product in stat.products" :key="product.id" class="flex justify-between text-sm">
-                <div class="text-gray-800">Nom article : {{ product.name }}</div>
-                <div class="text-gray-600">Prix : {{ product.price }} €</div>
-                <div class="text-gray-600">Qté: {{ product.pivot.quantity }}</div>
+  <div class="p-4">
+    <h2 class="text-lg font-bold text-center mb-4">Statistiques du {{ startDate }} au {{ endDate }}</h2>
+    <div class="flex flex-wrap -mx-2">
+      <div v-for="stat in data" :key="stat.id" class="w-1/2 px-2 mb-4">
+        <div class="border p-2">
+          <div class="text-sm font-semibold">Vente n°{{ stat.id }} - Total : {{ stat.total_amount }} €</div>
+          <div v-for="product in stat.products" :key="product.id" class="flex justify-between text-xs">
+            <div>{{ product.name }}</div>
+            <div>{{ product.price }} €</div>
+            <div>Qté: {{ product.pivot.quantity }}</div>
+          </div>
+          <div class="bg-gray-100 p-2 rounded">
+            <div class="grid grid-cols-4 gap-2 text-xs font-medium">
+              <div>Cash: {{ stat.cash }} €</div>
+              <div>Bancontact: {{ stat.bancontact }} €</div>
+              <div>Crédit: {{ stat.credit_card }} €</div>
+              <div>Virement: {{ stat.virement }} €</div>
             </div>
-            <h3>Montant total de la vente : {{ stat.total_amount }} €</h3>
-            <hr class="my-2">
+          </div>
         </div>
-        <div class="font-semibold text-lg mt-4">Total : {{ total_sales }} €</div>
+      </div>
     </div>
+    <div class="text-sm font-semibold">Total des ventes : {{ total_sales }} €</div>
+    <div class="text-sm">Total HTVA : {{ totalSalesHtva }} €</div>
+    <div class="text-sm">Montant TVA : {{ totalHtva }} €</div>
+  </div>
 </template>
 
 <script setup>
-    import {
-        defineProps
-    } from 'vue';
+import { defineProps } from 'vue';
 
-    const props = defineProps({
-        data: Object,
-        startDate: String,
-        endDate: String,
-        total_sales: Number,
-        salesData: Array,
-    });
-
+const props = defineProps({
+  data: Object,
+  startDate: String,
+  endDate: String,
+  total_sales: Number,
+  totalSalesHtva: Number,
+  totalHtva: Number
+});
 </script>
