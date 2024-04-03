@@ -8,6 +8,7 @@ import Heading from './components/layout/Heading.vue'
 import Cashier from './components/Cashier.vue'
 import Daily from './components/compta/Daily.vue'
 import Stats from './components/compta/Stats.vue'
+import Show from './components/compta/Show.vue'
 
 const app = createApp({});
 
@@ -19,6 +20,7 @@ app.component('ClientsList', ClientsList);
 app.component('CreateClient', CreateClient);
 app.component('Daily', Daily);
 app.component('Stats', Stats);
+app.component('Show', Show);
 
 
 app.mount('#app');

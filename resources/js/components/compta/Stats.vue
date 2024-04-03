@@ -12,18 +12,36 @@
         <div v-else>
             <canvas ref="salesChartCanvas" width="400" height="200"></canvas>
         </div>
-        <h2 v-if="total_sales">
-            TOTAL : {{ total_sales }} €
-            du {{ startDate }} au {{ endDate }}
-        </h2>
+        <!-- <a :href="`/stats/print`" class="flex-grow">
+            <button
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:-translate-y-1">
+                Imprimer statistiques
+            </button>
+        </a> -->
+
+        <div v-if="total_sales">
+            <a :href="`/stats/print?start=${startDate}&end=${endDate}`" class="flex-grow">
+                <button
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:-translate-y-1">
+                    Imprimer statistiques
+                </button>
+            </a>
+
+            <h2>
+                TOTAL : {{ total_sales }} €
+                du {{ startDate }} au {{ endDate }}
+            </h2>
+        </div>
         <div v-for="sale in sales" :key="sale.id" class="p-2 mb-2 bg-gray-50 rounded-lg shadow">
-    <h3 class="text-sm font-semibold text-gray-800 mb-1">Vente: {{ sale.id }}</h3>
-    <div v-for="product in sale.products" :key="product.id" class="mb-1">
-        <p class="text-sm font-semibold text-gray-700">Produit: {{ product.name }}, Prix: {{ product.price }}€, Quantité: {{ product.pivot.quantity }}, Total: {{ product.pivot.total }}€</p>
-    </div>
-    <p class="text-sm font-semibold text-gray-700">Total de la vente: {{ sale.total_amount }}€</p>
-    <button @click="deleteSale(sale.id)" class="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-sm">Supprimer</button>
-</div>
+            <h3 class="text-sm font-semibold text-gray-800 mb-1">Vente: {{ sale.id }}</h3>
+            <div v-for="product in sale.products" :key="product.id" class="mb-1">
+                <p class="text-sm font-semibold text-gray-700">Produit: {{ product.name }}, Prix: {{ product.price }}€,
+                    Quantité: {{ product.pivot.quantity }}, Total: {{ product.pivot.total }}€</p>
+            </div>
+            <p class="text-sm font-semibold text-gray-700">Total de la vente: {{ sale.total_amount }}€</p>
+            <button @click="deleteSale(sale.id)"
+                class="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-sm">Supprimer</button>
+        </div>
 
     </div>
 </template>
@@ -74,52 +92,53 @@
     };
 
     function renderChart(data) {
-    if (salesChart) {
-        salesChart.destroy();
-    }
-
-    const ctx = salesChartCanvas.value.getContext('2d');
-salesChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: Object.keys(data.salesByDay), // Utiliser les dates comme étiquettes
-        datasets: [{
-            label: 'Total des ventes par jour',
-            data: Object.values(data.salesByDay), // Utiliser les totaux des ventes par jour comme données
-            backgroundColor: 'rgba(54, 162, 235, 0.6)', // Couleur de remplissage plus douce
-            borderColor: 'rgba(54, 162, 235, 1)', // Couleur de la bordure
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: function (value) {
-                        return value + ' €';
-                    }
-                }
-            }
-        },
-        plugins: {
-            tooltip: {
-                callbacks: {
-                    label: function (context) {
-                        var label = context.dataset.label || '';
-                        if (label) {
-                            label += ': ';
-                        }
-                        if (context.parsed.y !== null) {
-                            label += context.parsed.y.toFixed(2) + ' €';
-                        }
-                        return label;
-                    }
-                }
-            }
+        if (salesChart) {
+            salesChart.destroy();
         }
-    }
-});
+
+        const ctx = salesChartCanvas.value.getContext('2d');
+        salesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(data.salesByDay), // Utiliser les dates comme étiquettes
+                datasets: [{
+                    label: 'Total des ventes par jour',
+                    data: Object.values(data
+                        .salesByDay), // Utiliser les totaux des ventes par jour comme données
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // Couleur de remplissage plus douce
+                    borderColor: 'rgba(54, 162, 235, 1)', // Couleur de la bordure
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return value + ' €';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                var label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y.toFixed(2) + ' €';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
 

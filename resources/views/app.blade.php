@@ -10,14 +10,14 @@
 <body>
     <div id="app">
         @auth
-        <form action="{{ route('auth.logout') }}" method="post">
+        {{-- <form action="{{ route('auth.logout') }}" method="post">
             @method("delete")
             @csrf
             <button
                 class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-110">
                 Se déconnecter
             </button>
-        </form>
+        </form> --}}
 
         <heading></heading>
 

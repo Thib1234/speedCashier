@@ -26,3 +26,5 @@ Route::post('/login', [LoginController::class, 'doLogin'])->name('auth.doLogin')
 Route::delete('/logout', [LoginController::class, 'logout'])->name('auth.logout');
 
 Route::view('/cashier', 'cashier')->name('cashier');
+
+Route::get('/stats/print', [\App\Http\Controllers\Api\Compta\ShowStatsController::class, 'show'])->name('stats.show');

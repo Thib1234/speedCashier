@@ -24,6 +24,8 @@ class Sale extends Model
         'virement',
         'total_amount',
         'client_id',
+        'montant_total_htva',
+        'amount_tva',
     ];
     public function productSales(): HasMany
     {

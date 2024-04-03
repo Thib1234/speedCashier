@@ -10,6 +10,16 @@
                     Effacer
                 </button>
             </div>
+            <!-- À l'intérieur de votre div "container" -->
+            <!-- Ajoutez cette section -->
+            <div class="flex flex-wrap justify-between w-full mx-1">
+                <button v-for="category in categories" :key="category.id" @click="filterByCategory(category.id)"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded m-1 flex-grow">
+                    {{ category.name }}
+                </button>
+            </div>
+
+
             <div v-if="filteredProducts.length === 0" class="empty-state text-gray-500 text-center">
                 Aucun produit trouvé.
             </div>
@@ -267,14 +277,19 @@
     import {
         ref,
         computed,
-        watchEffect
+        watchEffect,
+        onMounted,
     } from "vue";
     import {
         BanknotesIcon,
         CreditCardIcon
     } from "@heroicons/vue/24/outline";
+    onMounted(() => {
+        loadFromServer();
+    });
     const payment_id = ref(null);
     const products = ref({});
+    const categories = ref(null);
     const clients = ref({});
     const client_id = ref(null);
     const searchQuery = ref("");
@@ -294,23 +309,22 @@
     const temporaryProducts = ref([]);
     const tempProductName = ref(null);
     const tempProductPrice = ref(null);
-
+    const currentCategoryId = ref(null);
     const maxDisplayedProducts = ref(12); // Limite initiale de 18 produits à afficher
-
     const displayedProducts = ref([]); // Liste des produits actuellement affichés
-
-    const updateFilteredProducts = () => {
-        const filtered = Object.values(products.value).filter((product) =>
-            product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-        );
-        filteredProducts.value = filtered;
-    };
 
     const updateDisplayedProducts = () => {
         displayedProducts.value = filteredProducts.value.slice(
             0,
             maxDisplayedProducts.value
         );
+    };
+    const updateFilteredProducts = () => {
+        const filtered = filteredProducts.value.filter((product) =>
+            product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+        );
+        filteredProducts.value = filtered;
+        updateDisplayedProducts();
     };
 
     const addTemporaryProduct = (name, price) => {
@@ -335,17 +349,18 @@
     };
 
     const loadFromServer = async () => {
-        await axios
-            .get("/api/productsShow")
-            .then((res) => (products.value = res.data.data))
-            .catch((e) => console.log(e));
-        await axios
-            .get("/api/clients")
-            .then((res) => (clients.value = res.data.data))
-            .catch((e) => console.log(e));
+        try {
+            const response = await axios.get('/api/productsShow');
+            products.value = response.data.products
+                .data; // Accédez directement à la propriété 'products' de la réponse
+            categories.value = response.data.categories.data;
+            filterByCategory(null);
+        } catch (error) {
+            console.error(error);
+        }
     };
     //charge la liste des produits et des clients
-    loadFromServer();
+
     const addtotal = () => {
         // Vérifier le mode de paiement actif
         if (paymentMethod.value === "cash") {
@@ -526,6 +541,31 @@
                     error
                 );
             });
+    };
+
+    const filterByCategory = (categoryId) => {
+        // Vérifier si la même catégorie est déjà sélectionnée
+        if (categoryId === currentCategoryId.value) {
+            // Si oui, désélectionner la catégorie en lui attribuant la valeur null
+            currentCategoryId.value = null;
+        } else {
+            // Sinon, mettre à jour le categoryId actuel avec la nouvelle catégorie sélectionnée
+            currentCategoryId.value = categoryId;
+        }
+
+        // Filtrer les produits en fonction de la catégorie sélectionnée ou désélectionnée
+        if (currentCategoryId.value === null) {
+            // Si aucune catégorie n'est sélectionnée, afficher tous les produits
+            filteredProducts.value = Object.values(products.value);
+        } else {
+            // Sinon, filtrer les produits par la catégorie sélectionnée
+            filteredProducts.value = Object.values(products.value).filter(product => product.category_id ===
+                currentCategoryId.value);
+        }
+
+        // Appliquer le filtre de recherche après le filtrage par catégorie
+        updateFilteredProducts();
+        updateDisplayedProducts();
     };
 
 </script>
