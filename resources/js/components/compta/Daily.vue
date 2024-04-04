@@ -4,12 +4,12 @@
         <h2 class="text-4xl font-bold text-gray-800 mb-6">Statistiques de ventes pour aujourd'hui</h2>
         <div class="grid grid-cols-3 gap-4 mb-6">
             <div class="p-4 bg-blue-100 rounded-lg shadow">
-                <p class="font-semibold text-gray-700">Total des ventes:</p>
+                <p class="font-semibold text-gray-700">Nombre de ventes:</p>
                 <p class="text-xl">{{ totalSales }}</p>
             </div>
             <div class="p-4 bg-green-100 rounded-lg shadow">
-                <p class="font-semibold text-gray-700">Nombre de clients:</p>
-                <p class="text-xl">{{ totalClients }}</p>
+                <p class="font-semibold text-gray-700">Montant total des ventes du jour:</p>
+                <p class="text-xl">{{ totalAmount }} €</p>
             </div>
             <!-- <div class="p-4 bg-red-100 rounded-lg shadow">
                 <p class="font-semibold text-gray-700">Montant total:</p>
@@ -26,7 +26,7 @@
         <!-- Lignes de vente -->
         <div class="mt-10">
             <h2 class="text-4xl font-bold text-gray-800 mb-6">Lignes de vente du jour</h2>
-            <div v-if="salesLines.length === 0" class="text-gray-600">
+            <div v-if="sales.length === 0" class="text-gray-600">
                 <p>Aucune vente pour aujourd'hui.</p>
             </div>
             <div v-else>
@@ -40,22 +40,22 @@
                     </div>
                     <div class="mt-4">
                         <h4 class="text-md font-semibold text-gray-800 mb-2">Détails du paiement:</h4>
-                        <!-- <div v-if="sale.payment.cash" class="flex items-center space-x-2">
+                        <div v-if="sale.cash" class="flex items-center space-x-2">
                             <span class="font-medium">Espèces:</span>
-                            <span>{{ sale.payment.cash }}€</span>
+                            <span>{{ sale.cash }}€</span>
                         </div>
-                        <div v-if="sale.payment.bancontact" class="flex items-center space-x-2">
+                        <div v-if="sale.bancontact" class="flex items-center space-x-2">
                             <span class="font-medium">Bancontact:</span>
-                            <span>{{ sale.payment.bancontact }}€</span>
+                            <span>{{ sale.bancontact }}€</span>
                         </div>
-                        <div v-if="sale.payment.credit_card" class="flex items-center space-x-2">
+                        <div v-if="sale.credit_card" class="flex items-center space-x-2">
                             <span class="font-medium">Carte de crédit:</span>
-                            <span>{{ sale.payment.credit_card }}€</span>
+                            <span>{{ sale.credit_card }}€</span>
                         </div>
-                        <div v-if="sale.payment.virement" class="flex items-center space-x-2">
+                        <div v-if="sale.virement" class="flex items-center space-x-2">
                             <span class="font-medium">Virement:</span>
-                            <span>{{ sale.payment.virement }}€</span>
-                        </div> -->
+                            <span>{{ sale.virement }}€</span>
+                        </div>
                     </div>
                     <button @click="deleteSale(sale.id)"
                         class="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Supprimer
@@ -79,7 +79,7 @@
     let salesChart = null;
     const totalSales = ref(0);
     const totalClients = ref(0);
-
+    const totalAmount =ref(0);
     const salesLines = ref([]);
     const sales = ref([]);
 
@@ -89,7 +89,7 @@
             const data = response.data;
             totalSales.value = data.total_sales;
             totalClients.value = data.total_clients;
-            
+            totalAmount.value = data.totalAmount;
             salesLines.value = data.sale_lines;
             sales.value = data.sales;
             await nextTick();
@@ -97,6 +97,8 @@
             renderChart(data);
             console.log(salesLines.value);
             console.log(sales.value);
+            console.log(totalSales.value);
+            console.log(totalAmount.value);
         } catch (error) {
             if (error.response) {
                 console.error('Error fetching sales:', error.response.data);

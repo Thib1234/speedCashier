@@ -24,6 +24,8 @@ class DailyStatsController extends Controller
          //dd($sale);
         // Nombre total de ventes du jour
         $totalSales = Sale::whereDate('created_at', $today)->count();
+        
+        $totalAmount = Sale::whereDate('created_at', $today)->sum('total_amount');
 
 
         // Nombre total de clients pour aujourd'hui
@@ -72,6 +74,7 @@ class DailyStatsController extends Controller
             // 'total_payments' => $totalPayments,
             'sale_lines' => $saleLines,
             'sales' => $sales,
+            'totalAmount' => $totalAmount,
         ]);
     }
 }

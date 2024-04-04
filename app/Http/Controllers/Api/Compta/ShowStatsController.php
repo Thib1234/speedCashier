@@ -198,19 +198,6 @@ class ShowStatsController extends Controller
             $saleLines[] = $saleLine;
         }
     }
-        // return response()->json([
-        //     'total_sales' => $totalSales,
-		// 	'total_clients' => $totalClients,
-		// 	'sale_lines' => $saleLines,
-		// 	'sales' => $sales,
-		// 	'salesByDay' => $salesByDay,
-		// 	'startDate' => $startDate, // Ajoutez les valeurs de startDate et endDate à la vue
-		// 	'endDate' => $endDate,
-        // ]);
-        // $salesData = new \stdClass();
-        // $salesData->totalSalesHtva = $totalSalesHtva;
-        // $salesData->amountTva = $totalHtva;
-
 		return view('compta.show', [
 			'total_sales' => $totalSales,
 			'total_clients' => $totalClients,
