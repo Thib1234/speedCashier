@@ -25,6 +25,9 @@ Route::group(['middleware' =>['auth:sanctum']], function(){
     route::put('products/{product}', \App\Http\Controllers\Api\Product\UpdateController::class)->name('products.update');
     route::put('activeProduct/{product}', \App\Http\Controllers\Api\Product\ActiveController::class)->name('products.active');
 
+    route::get('categorie', \App\Http\Controllers\Api\Categorie\IndexController::class)->name('categories.index');
+
+
     route::get('clients', \App\Http\Controllers\Api\Client\IndexController::class)->name('clients.index');
     route::post('clients', \App\Http\Controllers\Api\Client\StoreController::class)->name('clients.store');
 

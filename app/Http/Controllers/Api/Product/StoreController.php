@@ -20,6 +20,7 @@ class StoreController extends Controller
             'price' => 'required|numeric',
             'stock' => 'integer|nullable',
             'purchase_price' => 'numeric|nullable',
+            'category_id' => 'integer',
         ]);
 
         $product = Product::create($validated);

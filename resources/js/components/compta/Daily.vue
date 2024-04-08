@@ -79,9 +79,11 @@
     let salesChart = null;
     const totalSales = ref(0);
     const totalClients = ref(0);
-    const totalAmount =ref(0);
+    const totalAmount = ref(0);
     const salesLines = ref([]);
     const sales = ref([]);
+    const salesByHour = ref();
+    const labels = ref();
 
     async function fetchSalesStats() {
         try {
@@ -92,13 +94,11 @@
             totalAmount.value = data.totalAmount;
             salesLines.value = data.sale_lines;
             sales.value = data.sales;
+            labels.value = data.labels
+            salesByHour.value = data.salesByHour;
             await nextTick();
             loading.value = false;
             renderChart(data);
-            console.log(salesLines.value);
-            console.log(sales.value);
-            console.log(totalSales.value);
-            console.log(totalAmount.value);
         } catch (error) {
             if (error.response) {
                 console.error('Error fetching sales:', error.response.data);
@@ -123,25 +123,42 @@
         if (salesChartCanvas.value) {
             const ctx = salesChartCanvas.value.getContext('2d');
             salesChart = new Chart(ctx, {
-                type: 'bar',
+                type: 'bar', // Changer le type de graphique en barres
                 data: {
-                    labels: ['Montant total des paiements'],
+                    labels: Object.keys(data.salesByHour),
                     datasets: [{
                         label: 'Montant',
-                        data: [data.total_payments],
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
+                        data: Object.values(data.salesByHour),
+                        backgroundColor: 'rgba(173, 216, 230, 0.6)', // Couleur pastel pour le remplissage
+                        borderColor: 'rgba(173, 216, 230, 1)', // Couleur pastel pour la bordure
                         borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function (value) {
-                                    return value + ' €'; // Ajouter le symbole euro
+                    }],
+                    options: {
+                        // ...
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Heures' // Ajoutez un titre à l'axe x
                                 }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function (value) {
+                                        return value + ' €';
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Montant (€)' // Ajoutez un titre à l'axe y
+                                }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Ventes par heure' // Ajoutez un titre au graphique
                             }
                         }
                     }

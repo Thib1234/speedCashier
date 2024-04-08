@@ -83,7 +83,7 @@
             daily.value = data.dailyTotal;
             total_sales.value = data.total_sales;
             salesByDay.value = data.salesByDay;
-            console.log(sales.value);
+            
             console.log(salesByDay.value);
             renderChart(statsData.value);
         } catch (error) {

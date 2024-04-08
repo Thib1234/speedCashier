@@ -2,7 +2,7 @@
   <div class="p-4">
     <h2 class="text-lg font-bold text-center mb-4">Statistiques du {{ startDate }} au {{ endDate }}</h2>
     <div class="flex flex-wrap -mx-2">
-      <div v-for="stat in data" :key="stat.id" class="w-1/2 px-2 mb-4">
+      <div v-for="stat in data" :key="stat.id" class="w-full px-2 mb-4">
         <div class="border p-2">
           <div class="text-sm font-semibold">Vente n°{{ stat.id }} - Total : {{ stat.total_amount }} €</div>
           <div v-for="product in stat.products" :key="product.id" class="flex justify-between text-xs">
