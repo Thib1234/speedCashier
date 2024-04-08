@@ -4,7 +4,7 @@
     <div class="flex flex-wrap -mx-2">
       <div v-for="stat in data" :key="stat.id" class="w-full px-2 mb-4">
         <div class="border p-2">
-          <div class="text-sm font-semibold">Vente n°{{ stat.id }} - Total : {{ stat.total_amount }} €</div>
+          <div class="text-sm font-semibold">Vente n°{{ stat.id }} - Du {{ stat.datetime }} -  Total : {{ stat.total_amount }} €</div>
           <div v-for="product in stat.products" :key="product.id" class="flex justify-between text-xs">
             <div>{{ product.name }}</div>
             <div>{{ product.price }} €</div>
