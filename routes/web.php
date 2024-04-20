@@ -15,7 +15,9 @@ Route::view('/products/index', 'products.index')->name('products.index');
 Route::view('/products/create', 'products.create')->name('products.create');
 
 Route::view('/compta/daily', 'compta.daily')->name('compta.daily');
+Route::view('/compta/daily-toilettage', 'compta.daily_toilettage')->name('compta.daily_toilettage');
 Route::view('/compta/stats', 'compta.stats')->name('compta.stats');
+Route::view('/compta/stats-toilettage', 'compta.stats_toilettage')->name('compta.stats_toilettage');
 
 Route::get('/pdf', [TicketController::class, 'viewTicket'])->name('pdf.view');
 Route::get('/generate-pdf', [PDFController::class, 'generatePDF']);

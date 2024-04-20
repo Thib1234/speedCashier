@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Compta;
+namespace App\Http\Controllers\Api\StatToilettage;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sale;
@@ -12,23 +12,36 @@ use DateInterval;
 use DateTime;
 
 
-class DailyStatsController extends Controller
+class DailyStatController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
     public function __invoke(Request $request)
     { 
         // Récupérer la date d'aujourd'hui
         $today = now()->format('Y-m-d');
-        // $sales = Sale::whereDate('created_at', $today)->get();
-
-        $sales = Sale::whereDate('created_at', $today)->with('products', 'client')->get();
-         //dd($sale);
-        // Nombre total de ventes du jour
-        $totalSales = $sales->count();
         
-        $totalAmount = $sales->sum('total_amount');
+        // Récupérer les ventes avec au moins un produit de la catégorie "Toilettage"
+        $sales = Sale::whereDate('created_at', $today)
+            ->with(['products' => function ($query) {
+                $query->whereHas('category', function ($query) {
+                    $query->where('name', 'Toilettage');
+                });
+            }, 'client'])
+            ->get();
+
+        // Filtrer les ventes pour inclure uniquement celles qui n'ont que des produits de la catégorie "Toilettage"
+        $filteredSales = $sales->map(function ($sale) {
+            $sale->products = $sale->products->filter(function ($product) {
+                return $product->category->name === 'Toilettage';
+            });
+            return $sale;
+        })->filter(function ($sale) {
+            return $sale->products->isNotEmpty();
+        });
+
+        // Nombre total de ventes du jour
+        $totalSales = $filteredSales->count();
+        
+        $totalAmount = $filteredSales->sum('total_amount');
 
         // Nombre total de clients pour aujourd'hui
         $totalClients = Client::whereHas('sales', function ($query) use ($today) {
@@ -57,7 +70,6 @@ class DailyStatsController extends Controller
 
         $labels = array_keys($salesByHour);
 
-        
         // Remplir les heures sans ventes avec un total de 0
         $period = new DatePeriod(
             new DateTime($startDate),
@@ -66,43 +78,28 @@ class DailyStatsController extends Controller
         );
 
         $saleLines = [];
-        foreach ($sales as $sale) {
-            $product = Product::find($sale->product_id);
-        
-            // Vérifiez si le produit existe avant d'essayer d'accéder à ses propriétés
-            if ($product) {
+        foreach ($filteredSales as $sale) {
+            foreach ($sale->products as $product) {
                 $saleLine = [
                     'id' => $sale->id,
-                    'product_id' => $sale->product_id,
-                    'product_name' => $product->name, // Ajout du nom du produit
-                    'quantity' => $sale->quantity,
-                    'price' => $sale->price,
-                    // Ajoutez d'autres champs pertinents au besoin
-                ];
-                $saleLines[] = $saleLine;
-            } else {
-                // Gérer le cas où le produit n'existe pas
-                // Vous pouvez par exemple assigner un nom générique ou laisser vide
-                $saleLine = [
-                    'id' => $sale->id,
-                    'product_id' => $sale->product_id,
-                    'product_name' => 'Produit inconnu',
-                    'quantity' => $sale->quantity,
-                    'price' => $sale->price,
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'quantity' => $product->pivot->quantity,
+                    'price' => $product->pivot->price,
                     // Ajoutez d'autres champs pertinents au besoin
                 ];
                 $saleLines[] = $saleLine;
             }
         }
-            return response()->json([
-                'total_sales' => $totalSales,
-                'total_clients' => $totalClients,
-                // 'total_payments' => $totalPayments,
-                'sale_lines' => $saleLines,
-                'sales' => $sales,
-                'totalAmount' => $totalAmount,
-                'salesByHour' => $salesByHour,
-                'labels' => $labels,
-            ]);
-        }
+
+        return response()->json([
+            'total_sales' => $totalSales,
+            'total_clients' => $totalClients,
+            'sale_lines' => $saleLines,
+            'sales' => $filteredSales,
+            'totalAmount' => $totalAmount,
+            'salesByHour' => $salesByHour,
+            'labels' => $labels,
+        ]);
+    }
 }

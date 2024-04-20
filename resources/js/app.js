@@ -7,7 +7,10 @@ import CreateClient from './components/clients/CreateClient.vue'
 import Heading from './components/layout/Heading.vue'
 import Cashier from './components/Cashier.vue'
 import Daily from './components/compta/Daily.vue'
+import DailyToilettage from './components/compta/DailyToilettage.vue'
+import DailyAccessories from './components/compta/DailyAccessories.vue'
 import Stats from './components/compta/Stats.vue'
+import StatsToilettage from './components/compta/StatsToilettage.vue'
 import Show from './components/compta/Show.vue'
 
 const app = createApp({});
@@ -19,7 +22,10 @@ app.component('ProductsList', ProductsList);
 app.component('ClientsList', ClientsList);
 app.component('CreateClient', CreateClient);
 app.component('Daily', Daily);
+app.component('DailyToilettage', DailyToilettage);
+app.component('DailyAccessories', DailyAccessories);
 app.component('Stats', Stats);
+app.component('StatsToilettage', StatsToilettage);
 app.component('Show', Show);
 
 

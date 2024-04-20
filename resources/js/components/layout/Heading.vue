@@ -135,8 +135,7 @@
                                         aria-hidden="true" />
                                 </DisclosureButton>
                                 <DisclosurePanel class="mt-2 space-y-2">
-                                    <DisclosureButton v-for="item in products" :key="item.name"
-                                        as="a" :href="item.href"
+                                    <DisclosureButton v-for="item in products" :key="item.name" as="a" :href="item.href"
                                         class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                                         {{ item.name }}</DisclosureButton>
                                 </DisclosurePanel>
@@ -159,21 +158,20 @@
         </Dialog>
     </header>
 </template>
-
 <script setup>
     import {
         ref
     } from 'vue'
     import {
         Dialog,
-    DialogPanel,
-    Disclosure,
-    DisclosureButton,
-    DisclosurePanel,
-    Popover,
-    PopoverButton,
-    PopoverGroup,
-    PopoverPanel,
+        DialogPanel,
+        Disclosure,
+        DisclosureButton,
+        DisclosurePanel,
+        Popover,
+        PopoverButton,
+        PopoverGroup,
+        PopoverPanel,
     } from '@headlessui/vue'
     import {
         Bars3Icon,
@@ -187,7 +185,7 @@
     import {
         ChevronDownIcon,
     } from '@heroicons/vue/20/solid'
-    const enabled = ref(false);
+    const mobileMenuOpen = ref(false)
     const products = [{
             name: 'Ajouter un produit',
             description: '',
@@ -215,18 +213,29 @@
         }
     ]
     const stats = [{
-            name: 'Stats du jour',
-            description: 'Affiche les stats du jour',
+            name: 'Stats générales du jour',
+            description: 'Affiche les stats totales du jour',
             href: '/compta/daily',
             icon: CalculatorIcon
         },
         {
-            name: 'Stats',
-            description: 'Affiche les stats générales',
+            name: 'Stats toilettages du jour',
+            description: 'Affiche les statistiques des toilettages pour la journée',
+            href: '/compta/daily-toilettage',
+            icon: ChartBarIcon
+        },
+        {
+            name: 'Stats générales avec période',
+            description: 'Affiche les stats générales sur une période déterminée',
             href: '/compta/stats',
             icon: ChartBarIcon
-        }
+        },
+        {
+            name: 'Stats toilettage avec période',
+            description: 'Affiche les stats générales des toilettages sur une période déterminée',
+            href: '/compta/stats-toilettage',
+            icon: ChartBarIcon
+        },
     ]
-    const mobileMenuOpen = ref(false)
 
 </script>

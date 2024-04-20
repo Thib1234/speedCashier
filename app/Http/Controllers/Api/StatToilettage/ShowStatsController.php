@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Compta;
+namespace App\Http\Controllers\Api\StatToilettage;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sale;
@@ -21,26 +21,41 @@ class ShowStatsController extends Controller
         $endDate = $request->input('end');
         $salesByDay = [];
 
-        $sales = Sale::whereDate('created_at', '>=',$startDate)->with('products', 'client')
-            ->whereDate('created_at', '<=', $endDate)
-            ->get();
-        // Nombre total de ventes du jour
+        // $sales = Sale::whereDate('created_at', '>=',$startDate)->with('products', 'client')
+        //     ->whereDate('created_at', '<=', $endDate)
+        //     ->get();
+        // // Nombre total de ventes du jour
+
+		 // Récupération des ventes par jour V2 a tester
+		// $sales = Sale::whereDate('created_at', '>=',$startDate)
+		// ->whereDate('created_at', '<=', $endDate)
+		// ->with('products', 'client')
+		// ->get();
+
+		$sales = Sale::whereDate('created_at', '>=', $startDate)->with(['products' => function ($query){
+			$query->whereHas('category', function ($query) {
+				$query->where('name', 'Toilettage');
+			});
+		}, 'client'])
+		->whereDate('create_at', '<=', $endDate)
+		->get();
+
+		$filteredSales = $sales->map(function ($sale) {
+            $sale->products = $sale->products->filter(function ($product) {
+                return $product->category->name === 'Toilettage';
+            });
+            return $sale;
+        })->filter(function ($sale) {
+            return $sale->products->isNotEmpty();
+        });
         
-        $totalSales = Sale::whereDate('created_at', '>=', $startDate)
-            ->whereDate('created_at', '<=', $endDate)
-            ->sum('total_amount');
+        $totalSales = $filteredSales->sum('total_amount');
 
         // Nombre total de clients pour aujourd'hui
         $totalClients = Client::whereHas('sales', function ($query) use ($startDate, $endDate) {
             $query->whereDate('created_at', '>=', $startDate)
                 ->whereDate('created_at', '<=', $endDate);
         })->count();
-
-        // Récupération des ventes par jour
-        $sales = Sale::whereDate('created_at', '>=',$startDate)
-            ->whereDate('created_at', '<=', $endDate)
-            ->with('products', 'client')
-            ->get();
 
         // Calcul du total des ventes par jour
         foreach ($sales as $sale) {
@@ -69,7 +84,7 @@ class ShowStatsController extends Controller
         ksort($salesByDay);
 
         $saleLines = [];
-        foreach ($sales as $sale) {
+        foreach ($filteredSales as $sale) {
             $product = Product::find($sale->product_id);
         
             // Vérifiez si le produit existe avant d'essayer d'accéder à ses propriétés
@@ -101,7 +116,7 @@ class ShowStatsController extends Controller
             'total_sales' => $totalSales,
             'total_clients' => $totalClients,
             'sale_lines' => $saleLines,
-            'sales' => $sales,
+            'sales' => $filteredSales,
             'salesByDay' => $salesByDay,
             // 'dailyTotal' => $dailyTotals,
         ]);

@@ -36,8 +36,6 @@ class StatsController extends Controller
                 ->whereDate('created_at', '<=', $endDate);
         })->count();
 
-        
-
         // Récupération des ventes par jour
         $sales = Sale::whereDate('created_at', '>=',$startDate)
             ->whereDate('created_at', '<=', $endDate)

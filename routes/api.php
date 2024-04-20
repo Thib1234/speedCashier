@@ -33,8 +33,10 @@ Route::group(['middleware' =>['auth:sanctum']], function(){
 
     route::post('sales', \App\Http\Controllers\Api\Sale\SaleController::class)->name('sales.store');
     route::get('daily-stats', \App\Http\Controllers\Api\Compta\DailyStatsController::class)->name('compta.daily');
+    route::get('daily-stats-toilettage', \App\Http\Controllers\Api\StatToilettage\DailyStatController::class)->name('compta.daily_toilettage');
     route::delete('sales/{saleId}', \App\Http\Controllers\Api\Sale\DeleteSaleController::class)->name('sales.delete');
     route::get('stats', \App\Http\Controllers\Api\Compta\StatsController::class)->name('compta.stats');
+    route::get('stats-toilettage', \App\Http\Controllers\Api\StatToilettage\StatsController::class)->name('compta.stats-toilettage');
 
     route::post('pdf', \App\Http\Controllers\Api\Pdf\TicketController::class)->name('ticket.create');
 });

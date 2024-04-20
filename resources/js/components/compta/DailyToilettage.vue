@@ -1,14 +1,14 @@
 <template>
     <div class="container mx-auto p-6 bg-white shadow-lg rounded-lg">
         <!-- Statistiques de ventes -->
-        <h2 class="text-4xl font-bold text-gray-800 mb-6">Statistiques de ventes pour aujourd'hui</h2>
+        <h2 class="text-4xl font-bold text-gray-800 mb-6">Statistiques des toilettages pour aujourd'hui</h2>
         <div class="grid grid-cols-3 gap-4 mb-6">
             <div class="p-4 bg-blue-100 rounded-lg shadow">
-                <p class="font-semibold text-gray-700">Nombre de ventes:</p>
+                <p class="font-semibold text-gray-700">Nombre de toilettages:</p>
                 <p class="text-xl">{{ totalSales }}</p>
             </div>
             <div class="p-4 bg-green-100 rounded-lg shadow">
-                <p class="font-semibold text-gray-700">Montant total des ventes du jour:</p>
+                <p class="font-semibold text-gray-700">Montant total des toilettages pour aujourd'hui:</p>
                 <p class="text-xl">{{ totalAmount }} €</p>
             </div>
         </div>
@@ -21,17 +21,17 @@
 
         <!-- Lignes de vente -->
         <div class="mt-10">
-            <h2 class="text-4xl font-bold text-gray-800 mb-6">Lignes de vente du jour</h2>
+            <h2 class="text-4xl font-bold text-gray-800 mb-6">Toilettages</h2>
             <div v-if="sales.length === 0" class="text-gray-600">
-                <p>Aucune vente pour aujourd'hui.</p>
+                <p>Aucun toilettage aujourd'hui.</p>
             </div>
             <div v-else>
                 <div v-for="sale in sales" :key="sale.id" class="p-6 mb-4 bg-gray-50 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Numéro de la vente: {{ sale.id }}</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Numéro du toilettage: {{ sale.id }}</h3>
                     <div v-for="product in sale.products" :key="product.id" class="mb-2">
-                        <p class="font-semibold text-gray-700">Nom du Produit:</p>
+                        <p class="font-semibold text-gray-700">toilettage:</p>
                         <p>{{ product.name }}</p>
-                        <p class="font-semibold text-gray-700">Prix du produit:</p>
+                        <p class="font-semibold text-gray-700">montant:</p>
                         <p>{{ product.price }}€</p>
                     </div>
                     <div class="mt-4">
@@ -74,7 +74,6 @@
     const salesChartCanvas = ref(null);
     let salesChart = null;
     const totalSales = ref(0);
-    const totalClients = ref(0);
     const totalAmount = ref(0);
     const salesLines = ref([]);
     const sales = ref([]);
@@ -83,10 +82,9 @@
 
     async function fetchSalesStats() {
         try {
-            const response = await axios.get('/api/daily-stats');
+            const response = await axios.get('/api/daily-stats-toilettage');
             const data = response.data;
             totalSales.value = data.total_sales;
-            totalClients.value = data.total_clients;
             totalAmount.value = data.totalAmount;
             salesLines.value = data.sale_lines;
             sales.value = data.sales;

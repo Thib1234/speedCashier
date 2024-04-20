@@ -254,7 +254,7 @@
         </div>
         <div v-if="paymentMethod === 'bancontact'" class="flex items-center mb-4">
             <label for="amountPaidBancontact" class="mr-2">Montant payé:</label>
-            <input id="amountPaidBancontact" type="number" v-model.number="amountPaidBancontact"
+            <input inputmode="numeric" id="amountPaidBancontact" type="number" v-model.number="amountPaidBancontact"
                 class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
         </div>
         <div v-if="paymentMethod === 'credit_card'" class="flex items-center mb-4">
