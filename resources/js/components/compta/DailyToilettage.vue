@@ -88,12 +88,15 @@
             totalAmount.value = data.totalAmount;
             salesLines.value = data.sale_lines;
             sales.value = data.sales;
-            labels.value = data.labels
+            labels.value = data.labels;
             salesByHour.value = data.salesByHour;
             await nextTick();
             loading.value = false;
             renderChart(data);
+            console.log("TEST");
             console.log(sales.value);
+            console.log("TEST");
+            console.log(salesByHour.value);
         } catch (error) {
             if (error.response) {
                 console.error('Error fetching sales:', error.response.data);
@@ -102,30 +105,25 @@
             }
         }
     }
-
     onMounted(async () => {
         fetchSalesStats();
     })
-
     async function renderChart(data) {
-        await nextTick(); // Attendre la mise à jour du DOM
-
-        // Détruire le graphique existant s'il y en a un
+        await nextTick();
         if (salesChart) {
             salesChart.destroy();
         }
-
         if (salesChartCanvas.value) {
             const ctx = salesChartCanvas.value.getContext('2d');
             salesChart = new Chart(ctx, {
-                type: 'bar', // Changer le type de graphique en barres
+                type: 'bar',
                 data: {
                     labels: Object.keys(data.salesByHour),
                     datasets: [{
                         label: 'Montant',
                         data: Object.values(data.salesByHour),
-                        backgroundColor: 'rgba(173, 216, 230, 0.6)', // Couleur pastel pour le remplissage
-                        borderColor: 'rgba(173, 216, 230, 1)', // Couleur pastel pour la bordure
+                        backgroundColor: 'rgba(173, 216, 230, 0.6)',
+                        borderColor: 'rgba(173, 216, 230, 1)',
                         borderWidth: 1
                     }],
                     options: {
@@ -133,7 +131,7 @@
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'Heures' // Ajoutez un titre à l'axe x
+                                    text: 'Heures'
                                 }
                             },
                             y: {
@@ -145,14 +143,14 @@
                                 },
                                 title: {
                                     display: true,
-                                    text: 'Montant (€)' // Ajoutez un titre à l'axe y
+                                    text: 'Montant (€)'
                                 }
                             }
                         },
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Ventes par heure' // Ajoutez un titre au graphique
+                                text: 'Ventes par heure'
                             }
                         }
                     }
@@ -160,7 +158,6 @@
             });
         }
     }
-
     async function deleteSale(saleId) {
         try {
             const response = await axios.delete(`/api/sales/${saleId}`);
@@ -172,5 +169,4 @@
             console.error('Erreur lors de la suppression de la vente:', error.response.data.message);
         }
     }
-
 </script>

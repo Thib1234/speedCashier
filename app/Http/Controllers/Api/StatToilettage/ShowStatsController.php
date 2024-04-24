@@ -21,17 +21,6 @@ class ShowStatsController extends Controller
         $endDate = $request->input('end');
         $salesByDay = [];
 
-        // $sales = Sale::whereDate('created_at', '>=',$startDate)->with('products', 'client')
-        //     ->whereDate('created_at', '<=', $endDate)
-        //     ->get();
-        // // Nombre total de ventes du jour
-
-		 // Récupération des ventes par jour V2 a tester
-		// $sales = Sale::whereDate('created_at', '>=',$startDate)
-		// ->whereDate('created_at', '<=', $endDate)
-		// ->with('products', 'client')
-		// ->get();
-
 		$sales = Sale::whereDate('created_at', '>=', $startDate)->with(['products' => function ($query){
 			$query->whereHas('category', function ($query) {
 				$query->where('name', 'Toilettage');

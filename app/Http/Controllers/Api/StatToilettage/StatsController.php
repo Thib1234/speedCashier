@@ -19,31 +19,29 @@ class StatsController extends Controller
         $startDate = $request->input('start');
         $endDate = $request->input('end');
         $salesByDay = [];
-
-		$sales = Sale::whereDate('created_at', '>=', $startDate)->with(['products' => function ($query){
-			$query->whereHas('category', function ($query) {
-				$query->where('name', 'Toilettage');
-			});
-		}, 'client'])
-		->whereDate('created_at', '<=', $endDate)
-		->get();
-
-		$filteredSales = $sales->map(function ($sale) {
-            $sale->products = $sale->products->filter(function ($product) {
-                return $product->category->name === 'Toilettage';
-            });
-            return $sale;
-        })->filter(function ($sale) {
-            return $sale->products->isNotEmpty();
-        })->load('products'); // Charger tous les produits en une seule fois
-        
-        $totalSales = $filteredSales->sum('total_amount');
-        
+        $sales = Sale::whereDate('created_at', '>=', $startDate)->with(['client', 'products.category'])
+            ->whereDate('created_at', '<=', $endDate)
+            ->get();
+            $filteredSales = $sales->map(function ($sale) {
+                $filteredProducts = $sale->products->filter(function ($product) {
+                    return $product->category && $product->category->name === 'Toilettage';
+                });
+                if ($filteredProducts->isEmpty()) {
+                    return null;
+                }
+                $filteredSale = clone $sale;
+                $filteredSale->setRelation('products', $filteredProducts);
+                $filteredSale->total_amount = $filteredProducts->sum('price');
+                return $filteredSale;
+            })->filter();
+        $totalSales = $filteredSales->count();
+        $totalAmount = $filteredSales->sum(function ($sale) {
+            return $sale->products->sum('price');
+        });
         $totalClients = Client::whereHas('sales', function ($query) use ($startDate, $endDate) {
             $query->whereDate('created_at', '>=', $startDate)
                 ->whereDate('created_at', '<=', $endDate);
         })->count();
-
         foreach ($filteredSales as $sale) {
             $date = $sale->created_at->toDateString();
             if (!isset($salesByDay[$date])) {
@@ -51,44 +49,27 @@ class StatsController extends Controller
             }
             $salesByDay[$date] += $sale->total_amount;
         }
-
         $period = new DatePeriod(
             new DateTime($startDate),
             new DateInterval('P1D'),
             (new DateTime($endDate))->modify('+1 day')
         );
-
         foreach ($period as $date) {
             $dateString = $date->format('Y-m-d');
             if (!isset($salesByDay[$dateString])) {
                 $salesByDay[$dateString] = 0;
             }
         }
-
         ksort($salesByDay);
-
         $saleLines = [];
-
         foreach ($filteredSales as $sale) {
-            $product = $sale->product; // Utiliser le produit chargé
-            if ($product) {
+            foreach ($sale->products as $product) {
                 $saleLine = [
                     'id' => $sale->id,
-                    'product_id' => $sale->product_id,
-                    'product_name' => $product->name, // Ajout du nom du produit
-                    'quantity' => $sale->quantity,
-                    'price' => $sale->price,
-                    // Ajoutez d'autres champs pertinents au besoin
-                ];
-                $saleLines[] = $saleLine;
-            } else {
-                $saleLine = [
-                    'id' => $sale->id,
-                    'product_id' => $sale->product_id,
-                    'product_name' => 'Produit inconnu',
-                    'quantity' => $sale->quantity,
-                    'price' => $sale->price,
-                    // Ajoutez d'autres champs pertinents au besoin
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'quantity' => $product->pivot->quantity,
+                    'price' => $product->pivot->price,
                 ];
                 $saleLines[] = $saleLine;
             }
@@ -100,6 +81,7 @@ class StatsController extends Controller
             'sale_lines' => $saleLines,
             'sales' => $filteredSales,
             'salesByDay' => $salesByDay,
+            'chien' => $totalAmount
             // 'dailyTotal' => $dailyTotals,
         ]);
     }

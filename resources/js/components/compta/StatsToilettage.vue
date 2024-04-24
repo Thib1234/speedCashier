@@ -22,7 +22,7 @@
             </a>
 
             <h2>
-                TOTAL : {{ total_sales }} €
+                TOTAL : {{ chien }} €
                 du {{ startDate }} au {{ endDate }}
             </h2>
         </div>
@@ -36,7 +36,9 @@
             <button @click="deleteSale(sale.id)"
                 class="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-sm">Supprimer</button>
         </div>
-
+{{ chien }}
+<h3>ICI</h3>
+{{ total_sales }}
     </div>
 </template>
 
@@ -58,6 +60,7 @@
     const daily = ref(null);
     const total_sales = ref(null);
     const salesByDay = ref(null);
+    const chien = ref(null);
 
     const fetchStats = async () => {
         if (!startDate.value || !endDate.value) {
@@ -78,29 +81,28 @@
             daily.value = data.dailyTotal;
             total_sales.value = data.total_sales;
             salesByDay.value = data.salesByDay;
+            chien.value = data.chien;
             console.log(salesByDay.value);
             renderChart(statsData.value);
         } catch (error) {
             console.error('Erreur lors de la récupération des statistiques :', error);
         }
     };
-
     function renderChart(data) {
         if (salesChart) {
             salesChart.destroy();
         }
-
         const ctx = salesChartCanvas.value.getContext('2d');
         salesChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: Object.keys(data.salesByDay), // Utiliser les dates comme étiquettes
+                labels: Object.keys(data.salesByDay),
                 datasets: [{
                     label: 'Total des ventes par jour',
                     data: Object.values(data
-                        .salesByDay), // Utiliser les totaux des ventes par jour comme données
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // Couleur de remplissage plus douce
-                    borderColor: 'rgba(54, 162, 235, 1)', // Couleur de la bordure
+                        .salesByDay),
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }]
             },
@@ -134,22 +136,18 @@
             }
         });
     }
-
-
     onMounted(() => {
         fetchStats();
     });
-
     async function deleteSale(saleId) {
         try {
             const response = await axios.delete(`/api/sales/${saleId}`);
             const deletedSaleId = response.data.sale_id;
-            console.log('Sale ID:', deletedSaleId); // Afficher le saleId dans la console
+            console.log('Sale ID:', deletedSaleId);
             salesLines.value = salesLines.value.filter(sale => sale.id !== deletedSaleId);
-            await fetchStats(); // Rappeler fetchSalesStats après la suppression
+            await fetchStats();
         } catch (error) {
             console.error('Erreur lors de la suppression de la vente:', error.response);
         }
     }
-
 </script>

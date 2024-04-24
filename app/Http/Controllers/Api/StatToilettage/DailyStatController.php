@@ -14,45 +14,72 @@ use DateTime;
 
 class DailyStatController extends Controller
 {
+    const CATEGORY_NAME = 'Toilettage';
+    const START_TIME = '06:00:00';
+    const END_TIME = '20:00:00';
+
     public function __invoke(Request $request)
     { 
-        // Récupérer la date d'aujourd'hui
         $today = now()->format('Y-m-d');
-        
-        // Récupérer les ventes avec au moins un produit de la catégorie "Toilettage"
-        $sales = Sale::whereDate('created_at', $today)
-            ->with(['products' => function ($query) {
-                $query->whereHas('category', function ($query) {
-                    $query->where('name', 'Toilettage');
-                });
-            }, 'client'])
-            ->get();
-
-        // Filtrer les ventes pour inclure uniquement celles qui n'ont que des produits de la catégorie "Toilettage"
-        $filteredSales = $sales->map(function ($sale) {
-            $sale->products = $sale->products->filter(function ($product) {
-                return $product->category->name === 'Toilettage';
-            });
-            return $sale;
-        })->filter(function ($sale) {
-            return $sale->products->isNotEmpty();
-        });
-
-        // Nombre total de ventes du jour
+        $sales = $this->getSales($today);
+        $filteredSales = $this->filterSales($sales);
         $totalSales = $filteredSales->count();
-        
-        $totalAmount = $filteredSales->sum('total_amount');
+        $totalAmount = $filteredSales->sum(function ($sale) {
+            return $sale->products->sum('price');
+        });
+        $totalClients = $this->getTotalClients($today);
+        $salesByHour = $this->getSalesByHour($filteredSales);
+        $saleLines = $this->getSaleLines($filteredSales);
 
-        // Nombre total de clients pour aujourd'hui
-        $totalClients = Client::whereHas('sales', function ($query) use ($today) {
-            $query->whereDate('created_at', $today);
+        return response()->json([
+            'total_sales' => $totalSales,
+            'total_clients' => $totalClients,
+            'sale_lines' => $saleLines,
+            'sales' => $filteredSales,
+            'totalAmount' => $totalAmount,
+            'salesByHour' => $salesByHour,
+            'labels' => array_keys($salesByHour),
+        ]);
+    }
+
+    private function getSales($date)
+    {
+        return Sale::whereDate('created_at', $date)
+            ->with(['client', 'products.category'])
+            ->get();
+    }
+
+    private function filterSales($sales)
+    {
+        return $sales->map(function ($sale) {
+            $filteredProducts = $sale->products->filter(function ($product) {
+                return $product->category && $product->category->name === self::CATEGORY_NAME;
+            });
+        
+            if ($filteredProducts->isEmpty()) {
+                return null;
+            }
+        
+            $filteredSale = clone $sale;
+            $filteredSale->setRelation('products', $filteredProducts);
+            $filteredSale->total_amount = $filteredProducts->sum('price');
+        
+            return $filteredSale;
+        })->filter();
+    }
+
+    private function getTotalClients($date)
+    {
+        return Client::whereHas('sales', function ($query) use ($date) {
+            $query->whereDate('created_at', $date);
         })->count();
+    }
 
-        $startDate = (new DateTime('today 06:00:00'))->format('Y-m-d H:00:00');
-        ; // Début de la période à 7h00 aujourd'hui
-        $endDate = (new DateTime('today 20:00:00'))->format('Y-m-d H:00:00'); // Fin de la période à 20h00 aujourd'hui
-        
-        $salesByHour = []; // Initialise un tableau pour stocker les ventes par heure
+    private function getSalesByHour($sales)
+    {
+        $startDate = (new DateTime('today ' . self::START_TIME))->format('Y-m-d H:00:00');
+        $endDate = (new DateTime('today ' . self::END_TIME))->format('Y-m-d H:00:00');
+        $salesByHour = [];
 
         foreach ($sales as $sale) {
             $saleDate = new DateTime($sale->created_at);
@@ -63,43 +90,25 @@ class DailyStatController extends Controller
                 }
                 $salesByHour[$hour] += $sale->total_amount;
             }
+            ksort($salesByHour);
+            return $salesByHour;
         }
-
-        // Trier le tableau par heure
-        ksort($salesByHour);
-
-        $labels = array_keys($salesByHour);
-
-        // Remplir les heures sans ventes avec un total de 0
-        $period = new DatePeriod(
-            new DateTime($startDate),
-            new DateInterval('PT1H'), // Interval de 1 heure
-            (new DateTime($endDate))->modify('+1 hour')
-        );
-
-        $saleLines = [];
-        foreach ($filteredSales as $sale) {
-            foreach ($sale->products as $product) {
-                $saleLine = [
-                    'id' => $sale->id,
-                    'product_id' => $product->id,
-                    'product_name' => $product->name,
-                    'quantity' => $product->pivot->quantity,
-                    'price' => $product->pivot->price,
-                    // Ajoutez d'autres champs pertinents au besoin
-                ];
-                $saleLines[] = $saleLine;
-            }
-        }
-
-        return response()->json([
-            'total_sales' => $totalSales,
-            'total_clients' => $totalClients,
-            'sale_lines' => $saleLines,
-            'sales' => $filteredSales,
-            'totalAmount' => $totalAmount,
-            'salesByHour' => $salesByHour,
-            'labels' => $labels,
-        ]);
     }
-}
+    
+    
+        private function getSaleLines($sales)
+        {
+            return $sales->flatMap(function ($sale) {
+                return $sale->products->map(function ($product) use ($sale) {
+                    return [
+                        'id' => $sale->id,
+                        'product_id' => $product->id,
+                        'product_name' => $product->name,
+                        'quantity' => $product->pivot->quantity,
+                        'price' => $product->pivot->price,
+                    ];
+                });
+            })->values();
+        }
+    }
+    
