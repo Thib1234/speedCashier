@@ -20,6 +20,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::group(['middleware' =>['auth:sanctum']], function(){
+
+    route::get('productsWithoutToilettage', \App\Http\Controllers\Api\Product\ProductExcludingToilettageController::class)->name('productswithouttoilettage.index');
     route::get('products', \App\Http\Controllers\Api\Product\IndexController::class)->name('products.index');
     route::get('productsShow', \App\Http\Controllers\Api\Product\ShowController::class)->name('products.show');
     route::post('products', \App\Http\Controllers\Api\Product\StoreController::class)->name('products.store');
@@ -29,8 +31,8 @@ Route::group(['middleware' =>['auth:sanctum']], function(){
     route::get('categorie', \App\Http\Controllers\Api\Categorie\IndexController::class)->name('categories.index');
 
     Route::get('/acomptes', [AcompteController::class, 'index']);
-    Route::post('/acomptes/store', [AcompteController::class, 'store']);
-    Route::post('/sales/{sale}/apply-acompte', [AcompteController::class, 'apply']);
+    Route::post('/acompte/store', [AcompteController::class, 'store']);
+    Route::post('/account/{account}/apply-acompte', [AcompteController::class, 'apply']);
     Route::post('/acomptes/{acompte}/refund', [AcompteController::class, 'refund']);
 
 
