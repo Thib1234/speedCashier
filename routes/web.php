@@ -22,6 +22,9 @@ Route::view('/compta/stats-toilettage', 'compta.stats_toilettage')->name('compta
 Route::get('/pdf', [TicketController::class, 'viewTicket'])->name('pdf.view');
 Route::get('/generate-pdf', [PDFController::class, 'generatePDF']);
 
+Route::view('/account', 'acompte.show')->name('acompte.show');
+Route::view('/account/create', 'acompte.create')->name('acompte.create');
+
 Route::get('/register', [RegisterController::class, 'create']);
 
 Route::post('/login', [LoginController::class, 'doLogin'])->name('auth.doLogin');

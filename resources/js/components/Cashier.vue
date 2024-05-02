@@ -10,15 +10,12 @@
                     Effacer
                 </button>
             </div>
-            <!-- À l'intérieur de votre div "container" -->
-            <!-- Ajoutez cette section -->
-            <div class="flex flex-wrap justify-between w-full mx-1">
+            <div class="flex flex-nowrap justify-between w-full mx-1">
                 <button v-for="category in categories" :key="category.id" @click="filterByCategory(category.id)"
                     class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded m-1 flex-grow">
                     {{ category.name }}
                 </button>
             </div>
-
 
             <div v-if="filteredProducts.length === 0" class="empty-state text-gray-500 text-center">
                 Aucun produit trouvé.
@@ -67,7 +64,6 @@
                             </button>
                         </div>
                     </div>
-                    <!-- Pop-up pour sélectionner les clients -->
                     <div v-if="showPopup"
                         class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
                         <div class="bg-white p-8 max-w-md mx-auto rounded shadow-lg">
@@ -111,7 +107,6 @@
                                 Ajouter un produit temporaire
                             </h2>
                             <div class="w-full max-w-8xl">
-                                <!-- Afficher tous les produits temporaires -->
                                 <div v-for="(
                                         product, index
                                     ) in temporaryProducts" :key="index">
@@ -179,7 +174,6 @@
                         Payer
                     </button>
                 </div>
-                <!-- Modale de confirmation de paiement + création du ticket de caisse -->
                 <div v-if="showConfirmationModal"
                     class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
                     <div class="bg-white p-8 max-w-md mx-auto rounded shadow-lg">
@@ -221,7 +215,6 @@
                 <span class="mr-2">Cash</span>
                 <BanknotesIcon class="h-6 w-6" />
             </button>
-            <!-- Paiement Bancontact -->
             <button @click="selectpaymentMethod('bancontact')" :class="{
                     'bg-blue-500': paymentMethod === 'bancontact',
                     'bg-gray-400': paymentMethod !== 'bancontact',
@@ -229,7 +222,6 @@
                 <span class="mr-2">Bancontact</span>
                 <CreditCardIcon class="h-6 w-6" />
             </button>
-            <!-- Paiement par carte de crédit -->
             <button @click="selectpaymentMethod('credit_card')" :class="{
                     'bg-purple-500': paymentMethod === 'credit_card',
                     'bg-gray-400': paymentMethod !== 'credit_card',
@@ -237,7 +229,6 @@
                 <span class="mr-2">Carte de crédit</span>
                 <CreditCardIcon class="h-6 w-6" />
             </button>
-            <!-- Paiement par virement -->
             <button @click="selectpaymentMethod('virement')" :class="{
                     'bg-red-300': paymentMethod === 'virement',
                     'bg-gray-400': paymentMethod !== 'virement',
@@ -246,7 +237,6 @@
                 <CreditCardIcon class="h-6 w-6" />
             </button>
         </div>
-        <!-- Montant payé et montant à rendre pour le paiement en espèces -->
         <div v-if="paymentMethod === 'cash'" class="flex items-center mb-4">
             <label for="amountPaidCash" class="mr-2">Montant payé:</label>
             <input id="amountPaidCash" type="number" v-model.number="amountPaidCash"
@@ -295,7 +285,7 @@
     const searchQuery = ref("");
     const searchQueryClient = ref("");
     const cart = ref([]);
-    const paymentMethod = ref("cash"); // Déclaration de la propriété paymentMethods
+    const paymentMethod = ref("cash");
     const amountPaidCash = ref(0);
     const amountPaidBancontact = ref(0);
     const amountPaidCreditcard = ref(0);
@@ -310,8 +300,8 @@
     const tempProductName = ref(null);
     const tempProductPrice = ref(null);
     const currentCategoryId = ref(null);
-    const maxDisplayedProducts = ref(12); // Limite initiale de 18 produits à afficher
-    const displayedProducts = ref([]); // Liste des produits actuellement affichés
+    const maxDisplayedProducts = ref(12);
+    const displayedProducts = ref([]);
 
     const updateDisplayedProducts = () => {
         displayedProducts.value = filteredProducts.value.slice(
@@ -338,12 +328,11 @@
         };
         temporaryProducts.value.push(tempProduct);
 
-        // Créer une copie du produit temporaire pour éviter les références directes
         const productCopy = {
             ...tempProduct,
         };
 
-        addToCart(productCopy); // Ajoutez la copie du produit temporaire au panier
+        addToCart(productCopy);
         tempProductName.value = null;
         tempProductPrice.value = null;
     };
@@ -352,17 +341,15 @@
         try {
             const response = await axios.get('/api/productsShow');
             products.value = response.data.products
-                .data; // Accédez directement à la propriété 'products' de la réponse
+                .data;
             categories.value = response.data.categories.data;
             filterByCategory(null);
         } catch (error) {
             console.error(error);
         }
     };
-    //charge la liste des produits et des clients
 
     const addtotal = () => {
-        // Vérifier le mode de paiement actif
         if (paymentMethod.value === "cash") {
             amountPaidCash.value = Math.abs(changeDue.value);
         } else if (paymentMethod.value === "bancontact") {
@@ -393,7 +380,6 @@
 
     const selectpaymentMethod = (method) => {
         paymentMethod.value = method;
-        // Mettre à jour paymentId en fonction du mode de paiement sélectionné
         if (method === "cash") {
             payment_id.value = 1;
         } else if (method === "bancontact") {
@@ -417,7 +403,6 @@
     };
 
     const addToCart = (product) => {
-        //regarde si le produit est déjà présent dans le panier
         const existingItem = cart.value.find(
             (item) => item.product.id === product.id
         );
@@ -429,7 +414,7 @@
                     product: {
                         ...product,
                         price: product.price,
-                    }, // Inclure le prix du produit dans l'objet du panier
+                    },
                     quantity: 1,
                 });
             } else {
@@ -448,7 +433,6 @@
     };
 
     const sendSaleData = async () => {
-        // Construction de l'objet de données à envoyer au contrôleur
         const requestData = {
             products: cart.value.map((item) => ({
                 id: item.product.id,
@@ -464,20 +448,16 @@
             virement: amountPaidVirement.value,
         };
 
-        // Affichez les données à envoyer dans la console pour vérification
         console.log("Données à envoyer:", requestData);
 
-        // envoi de la requête au contrôleur Laravel pour la création du ticket de caisse
         await axios
             .post("/api/sales", requestData)
             .then((response) => {
-                // Réinitialiser le panier après avoir enregistré la vente
                 resetCart();
                 loadFromServer();
                 sale_id.value = response.data.sale_id;
                 console.log("ID de la vente:", sale_id.value);
 
-                // Maintenant que nous avons l'ID de la vente, nous générons le ticket de caisse
                 generateTicket(sale_id.value);
             })
             .catch((error) => {
@@ -505,31 +485,25 @@
         client_id.value = null;
     };
     const showMore = () => {
-        // Afficher plus de produits en ajoutant une certaine quantité au nombre maximal de produits affichés
         maxDisplayedProducts.value += 6;
     };
 
-    // TICKETS
     const confirmPayment = () => {
-        // Affichez la modale de confirmation lorsque le bouton "Payer" est cliqué
         showConfirmationModal.value = true;
     };
 
     const cancelPayment = () => {
-        // ne fait pas de ticket de caisse mais enregistre la vente
         sendSaleData();
         showConfirmationModal.value = false;
     };
 
     const createTicketAndPay = () => {
-        // Créez le ticket de caisse et procédez au paiement
-        sendSaleData(); // Envoye les données de la vente
-        generateTicket(); // Génére le ticket de caisse
-        showConfirmationModal.value = false; // Ferme la modale de confirmation
+        sendSaleData();
+        generateTicket();
+        showConfirmationModal.value = false;
     };
 
     const generateTicket = (saleId) => {
-        // Envoyer une demande au backend pour générer le ticket de caisse
         axios
             .post("/api/pdf", saleId)
             .then((response) => {
@@ -544,26 +518,18 @@
     };
 
     const filterByCategory = (categoryId) => {
-        // Vérifier si la même catégorie est déjà sélectionnée
         if (categoryId === currentCategoryId.value) {
-            // Si oui, désélectionner la catégorie en lui attribuant la valeur null
             currentCategoryId.value = null;
         } else {
-            // Sinon, mettre à jour le categoryId actuel avec la nouvelle catégorie sélectionnée
             currentCategoryId.value = categoryId;
         }
-
-        // Filtrer les produits en fonction de la catégorie sélectionnée ou désélectionnée
         if (currentCategoryId.value === null) {
-            // Si aucune catégorie n'est sélectionnée, afficher tous les produits
             filteredProducts.value = Object.values(products.value);
         } else {
-            // Sinon, filtrer les produits par la catégorie sélectionnée
             filteredProducts.value = Object.values(products.value).filter(product => product.category_id ===
                 currentCategoryId.value);
         }
 
-        // Appliquer le filtre de recherche après le filtrage par catégorie
         updateFilteredProducts();
         updateDisplayedProducts();
     };

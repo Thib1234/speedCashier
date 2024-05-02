@@ -18,4 +18,10 @@ class Client extends Model
     {
         return $this->hasMany(Sale::class);
     }
+
+    public function acomptes(): HasMany
+{
+    return $this->hasMany(Acompte::class);
+}
+
 }

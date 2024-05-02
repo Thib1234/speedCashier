@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Acompte\AcompteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +27,11 @@ Route::group(['middleware' =>['auth:sanctum']], function(){
     route::put('activeProduct/{product}', \App\Http\Controllers\Api\Product\ActiveController::class)->name('products.active');
 
     route::get('categorie', \App\Http\Controllers\Api\Categorie\IndexController::class)->name('categories.index');
+
+    Route::get('/acomptes', [AcompteController::class, 'index']);
+    Route::post('/acomptes/store', [AcompteController::class, 'store']);
+    Route::post('/sales/{sale}/apply-acompte', [AcompteController::class, 'apply']);
+    Route::post('/acomptes/{acompte}/refund', [AcompteController::class, 'refund']);
 
 
     route::get('clients', \App\Http\Controllers\Api\Client\IndexController::class)->name('clients.index');

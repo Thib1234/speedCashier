@@ -12,6 +12,8 @@ import DailyAccessories from './components/compta/DailyAccessories.vue'
 import Stats from './components/compta/Stats.vue'
 import StatsToilettage from './components/compta/StatsToilettage.vue'
 import Show from './components/compta/Show.vue'
+import AcountsList from './components/acompte/AccountsList.vue'
+import CreateAccount from './components/acompte/CreateAccount.vue'
 
 const app = createApp({});
 
@@ -27,6 +29,8 @@ app.component('DailyAccessories', DailyAccessories);
 app.component('Stats', Stats);
 app.component('StatsToilettage', StatsToilettage);
 app.component('Show', Show);
+app.component('AcountsList', AcountsList);
+app.component('CreateAccount', CreateAccount);
 
 
 app.mount('#app');

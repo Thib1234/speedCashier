@@ -11,12 +11,11 @@ use DatePeriod;
 use DateInterval;
 use DateTime;
 
-
 class DailyStatController extends Controller
 {
     const CATEGORY_NAME = 'Toilettage';
-    const START_TIME = '06:00:00';
-    const END_TIME = '20:00:00';
+    const START_TIME = '00:00:01';
+    const END_TIME = '23:59:59';
 
     public function __invoke(Request $request)
     { 

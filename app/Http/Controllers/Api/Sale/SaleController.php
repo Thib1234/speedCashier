@@ -43,16 +43,12 @@ class SaleController extends Controller
         $sale->save();
     
         foreach ($request->input('products') as $product) {
-            // Vérifier si le produit est temporaire
             if (substr($product['id'], 0, 1) === '_') {
-                //Créer le produit temporaire s'il n'existe pas déjà
                 $tempProduct = new Product();
-                $tempProduct->name = $product['name']; // Assurez-vous d'avoir le nom du produit dans la demande
+                $tempProduct->name = $product['name'];
                 $tempProduct->price = $product['price'];
-                // Autres attributs du produit temporaire peuvent être définis ici
                 $tempProduct->save();
-                
-                // Ajouter le produit temporaire à la vente
+
                 $productSale = new ProductSale();
                 $productSale->sale_id = $sale->id;
                 $productSale->product_id = $tempProduct->id;
@@ -62,7 +58,7 @@ class SaleController extends Controller
                 $productSale->save();
             } else { // Si le produit n'est pas temporaire
                 $prod = Product::find($product['id']);
-                $prod->stock = $prod->stock - $product['quantity']; // ajustement du stock en fonction de la vente
+                $prod->stock = $prod->stock - $product['quantity'];
                 $productSale = new ProductSale();
                 $productSale->sale_id = $sale->id;
                 $productSale->product_id = $product['id'];

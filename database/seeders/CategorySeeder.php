@@ -21,6 +21,11 @@ class CategorySeeder extends Seeder
             'Jouets',
             'Sacs',
             'Accessoires',
+            'Manteaux',
+            'Croquettes',
+            'Snacks',
+            'Plaids',
+            'San Bernard'
         ];
 
         foreach ($categories as $category) {
