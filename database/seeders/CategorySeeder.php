@@ -28,8 +28,13 @@ class CategorySeeder extends Seeder
             'San Bernard'
         ];
 
-        foreach ($categories as $category) {
-            Category::create(['name' => $category]);
+        $colors = ['bg-red-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500', 'bg-indigo-500', 'bg-purple-500', 'bg-pink-500'];
+
+        foreach ($categories as $key => $category) {
+            Category::create([
+                'name' => $category,
+                'color' => $colors[$key % count($colors)], // Attribue une couleur à chaque catégorie
+            ]);
         }
     }
 }

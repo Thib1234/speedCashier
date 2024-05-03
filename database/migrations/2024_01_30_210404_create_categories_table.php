@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id(); // Crée une colonne "id" en tant que clé primaire auto-incrémentée
             $table->string('name');
+            $table->string('color');
             // Ajoutez d'autres colonnes au besoin
             $table->timestamps(); // Ajoute automatiquement les colonnes "created_at" et "updated_at"
         });

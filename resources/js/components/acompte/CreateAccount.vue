@@ -17,9 +17,9 @@
                     <div
                         class="relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
                         <ComboboxInput
-                            class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
+                            class="ntm w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
                             :displayValue="(person) => person ? (person.name + ' ' + person.price + ' €' ) : ''"
-                            @change="query = $event.target.value" />
+                            @change="query = $event.target.value"/>
                         <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
                             <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                         </ComboboxButton>
@@ -131,6 +131,7 @@
             clients.value = clientsResponse.data.data;
             const response = await axios.get('/api/productsWithoutToilettage');
             people.value = response.data.data;
+
         } catch (error) {
             console.error('Erreur lors de la récupération des données:', error);
         }

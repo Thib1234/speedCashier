@@ -6,6 +6,7 @@ import ClientsList from './components/clients/ClientsList.vue'
 import CreateClient from './components/clients/CreateClient.vue'
 import Heading from './components/layout/Heading.vue'
 import Cashier from './components/Cashier.vue'
+import CashierTest from './components/CashierTest.vue'
 import Daily from './components/compta/Daily.vue'
 import DailyToilettage from './components/compta/DailyToilettage.vue'
 import DailyAccessories from './components/compta/DailyAccessories.vue'
@@ -19,6 +20,7 @@ const app = createApp({});
 
 app.component('Heading', Heading);
 app.component('cashier', Cashier);
+app.component('CashierTest', CashierTest);
 app.component('CreateProduct', CreateProduct);
 app.component('ProductsList', ProductsList);
 app.component('ClientsList', ClientsList);

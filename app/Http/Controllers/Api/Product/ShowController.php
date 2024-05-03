@@ -15,7 +15,7 @@ class ShowController extends Controller
     public function __invoke(Request $request)
     {
         // Récupérer uniquement les produits actifs
-        $products = Product::where('active', 1)->get();
+        $products = Product::where('active', 1)->paginate(16);
         $categories = Category::all();
 
         return response()->json([
