@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\Sale;
 use App\Models\Category;
+use App\Models\Acompte;
 
 class Product extends Model
 {
@@ -28,7 +29,12 @@ class Product extends Model
     }
     public function category()
     {
-        return $this->belongsTo(Category::class); // Relation belongsTo avec Category
+        return $this->belongsTo(Category::class);
+    }
+
+    public function acomptes()
+    {
+        return $this->hasMany(Acompte::class);
     }
     
 }

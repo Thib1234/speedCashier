@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\Sale;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Client;
 
 class Acompte extends Model
 {
@@ -16,9 +17,7 @@ class Acompte extends Model
     protected $fillable = [
         'name',
         'price',
-        'stock',
-        'purchase_price',
-        'active',
+        'rest',
         'category_id',
         'product_id'
     ];
@@ -32,9 +31,13 @@ class Acompte extends Model
     {
         return $this->belongsTo(Category::class); // Relation belongsTo avec Category
     }
-    public function products()
+    public function product()
     {
-        return $this->belongsToMany(Product::class);
+        return $this->belongsTo(Product::class);
+    }
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
     }
 
 }

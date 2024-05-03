@@ -11,9 +11,10 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('client_id');
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
-            $table->unsignedBigInteger('product_id'); // Enlever nullable pour rendre le champ obligatoire.
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade'); // Modifier également la directive onDelete.
+            $table->unsignedBigInteger('product_id');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->decimal('montant', 8, 2);
+            $table->decimal('rest', 8, 2);
             $table->dateTime('date');
             $table->string('status');
             $table->timestamps();

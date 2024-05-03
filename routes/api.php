@@ -33,7 +33,7 @@ Route::group(['middleware' =>['auth:sanctum']], function(){
     Route::get('/acomptes', [AcompteController::class, 'index']);
     Route::post('/acompte/store', [AcompteController::class, 'store']);
     Route::post('/account/{account}/apply-acompte', [AcompteController::class, 'apply']);
-    Route::post('/acomptes/{acompte}/refund', [AcompteController::class, 'refund']);
+    Route::post('/account/{account}/cancel', [AcompteController::class, 'cancel']);
 
 
     route::get('clients', \App\Http\Controllers\Api\Client\IndexController::class)->name('clients.index');

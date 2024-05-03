@@ -10,9 +10,9 @@
                     Effacer
                 </button>
             </div>
-            <div class="flex flex-nowrap justify-between w-full mx-1">
+            <div class="grid grid-cols-6 justify-between w-full mx-1">
                 <button v-for="category in categories" :key="category.id" @click="filterByCategory(category.id)"
-                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded m-1 flex-grow">
+                    class= "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded m-1 ">
                     {{ category.name }}
                 </button>
             </div>
@@ -41,7 +41,6 @@
         <div class="w-full max-w-3xl mt-10">
             <div class="flex flex-col items-center">
                 <div>
-                    <!-- Bouton pour afficher la pop-up de selection du client -->
                     <div class="flex">
                         <button @click="showPopUpTempProduct = true"
                             class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">
