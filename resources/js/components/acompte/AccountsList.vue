@@ -119,36 +119,12 @@
     const amountPaidCreditcard = ref(0);
     const amountPaidVirement = ref(0);
     const payment_id = ref(null);
-    // const totalAmount = ref(0);
     const initialChangeDue = ref(0);
 
     const showModal = (acompte) => {
         selectedAcompte.value = acompte;
-        console.log(acompte);
         initialChangeDue.value = selectedAcompte.value.rest;
         modalVisible.value = true;
-    };
-
-    const validateAcompte = async () => {
-        try {
-            const response = await axios.post(`/api/account/${selectedAcompte.value.id}/apply-acompte`, {
-                status: 'validé'
-            });
-            selectedAcompte.value.status = 'validé';
-            console.log('Statut mis à jour:', response.data);
-
-            const saleData = {
-                client_id: selectedAcompte.value.client_id,
-                total_amount: selectedAcompte.value.montant,
-            };
-            const saleResponse = await axios.post('/api/acompte/store',
-                saleData);
-            console.log('Vente créée avec succès:', saleResponse.data);
-
-            modalVisible.value = false;
-        } catch (error) {
-            console.error('Erreur lors de la mise à jour du statut ou de la création de la vente:', error);
-        }
     };
     const cancel = async () => {
         const response = await axios.post(`/api/account/${selectedAcompte.value.id}/cancel`, {
@@ -164,8 +140,6 @@
         try {
             const response = await axios.get('/api/acomptes');
             acomptes.value = response.data;
-            console.log(acomptes.value);
-            console.log(response);
         } catch (error) {
             console.error('Il y a eu un problème lors de la récupération des acomptes:', error);
         }
@@ -181,14 +155,7 @@
             amountPaidVirement.value = Math.abs(changeDue.value);
         }
     };
-    const updateInitialChangeDue = () => {
-        initialChangeDue.value = selectedAcompte.value.rest - (amountPaidCash.value +
-            amountPaidBancontact.value +
-            amountPaidCreditcard.value +
-            amountPaidVirement.value);
-    };
     const sendSale = async () => {
-        console.log('');
         try {
             const montant = amountPaidCash.value + amountPaidBancontact.value + amountPaidCreditcard.value +
                 amountPaidVirement.value;
@@ -201,9 +168,8 @@
                 credit_card: amountPaidCreditcard.value,
                 virement: amountPaidVirement.value,
             };
-            // const response = await axios.post('/api/acompte/store', payload);
-            const response = await axios.post(`/api/account/${selectedAcompte.value.id}/apply-acompte`, payload);
-            console.log(response.data);
+            const response = await axios.post(`/api/account/${selectedAcompte.value.id}/apply-acompte`,
+                payload);
             loadAccounts();
             modalVisible.value = false
         } catch (error) {

@@ -20,7 +20,6 @@ class AcompteController extends Controller
 
     public function store(Request $request)
     {
-
         $validatedData = $request->validate([
             'client_id' => 'required|exists:clients,id',
             'montant' => 'required|numeric|min:0',
@@ -53,10 +52,8 @@ class AcompteController extends Controller
         return response()->json(['message' => 'Acompte et vente créés avec succès', 'acompte_id' => $acompte->id, 'sale_id' => $sale->id], 201);
     }
 
-
 public function apply(Request $request, $accountId)
 {
-
     DB::transaction(function () use ($accountId, $request) {
         $acompte = Acompte::findOrFail($accountId);
         $acompte->status = 'appliqué';
@@ -78,7 +75,6 @@ public function apply(Request $request, $accountId)
 
     public function cancel(Request $request, $accountId)
     {
-        
         $acompte = Acompte::findOrFail($accountId);
         $acompte->status = 'remboursé';
         $acompte->save();
