@@ -10,20 +10,10 @@
 <body>
     <div id="app">
         @auth
-        {{-- <form action="{{ route('auth.logout') }}" method="post">
-            @method("delete")
-            @csrf
-            <button
-                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-110">
-                Se déconnecter
-            </button>
-        </form> --}}
-
         <heading></heading>
-
         @endauth
         @guest
-        <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+        <div class="flex flex-1 flex-col justify-center px-6 py-12 lg:px-8">
             <div class="sm:mx-auto sm:w-full sm:max-w-sm">
                 <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Se connecter
                 </h2>

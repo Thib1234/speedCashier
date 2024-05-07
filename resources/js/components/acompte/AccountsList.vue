@@ -5,7 +5,6 @@
             <li v-for="acompte in acomptes" :key="acompte.id" @click="showModal(acompte)"
                 class="flex justify-between items-center p-3 hover:bg-gray-100 cursor-pointer">
                 <span>Client: {{ acompte.client.name }}</span>
-                <span>Montant: {{ acompte.montant }}€</span>
                 <span>Status: {{ acompte.status }}</span>
                 <span>Article: {{acompte.product.name}}</span>
                 <span>Montant: {{acompte.product.price}} €</span>
@@ -58,7 +57,7 @@
                 </div>
                 <div v-if="paymentMethod === 'cash'" class="flex items-center mb-4">
                     <label for="amountPaidCash" class="mr-2">Montant payé:</label>
-                    <input id="amountPaidCash" type="number" v-model.number="amountPaidCash"
+                    <input inputmode="numeric" id="amountPaidCash" type="number" v-model.number="amountPaidCash"
                         class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
                 </div>
                 <div v-if="paymentMethod === 'bancontact'" class="flex items-center mb-4">
@@ -78,14 +77,17 @@
                         class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
                 </div>
             </div>
-            <div class="flex items-center justify-between">
-                <button v-if="changeDue === 0"
-                    class="w-full bg-blue-500 text-white py-4 rounded-lg mt-8 hover:bg-blue-600 focus:outline-none text-xl">
-                    Payé
-                </button>
+            <div class="flex justify-center">
                 <span v-if="changeDue > 0" class="ml-4 text-blue-500">Montant à rendre: {{ changeDue }} €</span>
                 <span v-if="changeDue < 0" class="ml-4 text-red-500">Reste à payer: {{ Math.abs(changeDue) }} €</span>
                 <span v-if="changeDue === 0" class="ml-4 text-green-500">Compte juste</span>
+                <button v-if="changeDue !== 0" @click="addtotal">{{ Math.abs(changeDue) }}</button>
+            </div>
+            <div class="flex items-center justify-between">
+                <button @click="sendSale" v-if="changeDue === 0"
+                    class="w-full bg-blue-500 text-white py-4 rounded-lg mt-8 hover:bg-blue-600 focus:outline-none text-xl">
+                    Payé
+                </button>
             </div>
             <div class="flex items-center justify-between mt-5">
                 <button type="button" @click="cancel"
@@ -100,8 +102,13 @@
 <script setup>
     import {
         ref,
-        onMounted
+        onMounted,
+        computed
     } from 'vue';
+    import {
+        BanknotesIcon,
+        CreditCardIcon
+    } from "@heroicons/vue/24/outline";
 
     const acomptes = ref([]);
     const modalVisible = ref(false);
@@ -112,8 +119,13 @@
     const amountPaidCreditcard = ref(0);
     const amountPaidVirement = ref(0);
     const payment_id = ref(null);
+    // const totalAmount = ref(0);
+    const initialChangeDue = ref(0);
+
     const showModal = (acompte) => {
         selectedAcompte.value = acompte;
+        console.log(acompte);
+        initialChangeDue.value = selectedAcompte.value.rest;
         modalVisible.value = true;
     };
 
@@ -152,11 +164,58 @@
         try {
             const response = await axios.get('/api/acomptes');
             acomptes.value = response.data;
+            console.log(acomptes.value);
             console.log(response);
         } catch (error) {
             console.error('Il y a eu un problème lors de la récupération des acomptes:', error);
         }
     }
+    const addtotal = () => {
+        if (paymentMethod.value === "cash") {
+            amountPaidCash.value = Math.abs(changeDue.value);
+        } else if (paymentMethod.value === "bancontact") {
+            amountPaidBancontact.value = Math.abs(changeDue.value);
+        } else if (paymentMethod.value === "credit_card") {
+            amountPaidCreditcard.value = Math.abs(changeDue.value);
+        } else if (paymentMethod.value === "virement") {
+            amountPaidVirement.value = Math.abs(changeDue.value);
+        }
+    };
+    const updateInitialChangeDue = () => {
+        initialChangeDue.value = selectedAcompte.value.rest - (amountPaidCash.value +
+            amountPaidBancontact.value +
+            amountPaidCreditcard.value +
+            amountPaidVirement.value);
+    };
+    const sendSale = async () => {
+        console.log('');
+        try {
+            const montant = amountPaidCash.value + amountPaidBancontact.value + amountPaidCreditcard.value +
+                amountPaidVirement.value;
+            const payload = {
+                montant: montant,
+                client_id: selectedAcompte.value.client_id,
+                product_id: selectedAcompte.value.product_id,
+                cash: amountPaidCash.value,
+                bancontact: amountPaidBancontact.value,
+                credit_card: amountPaidCreditcard.value,
+                virement: amountPaidVirement.value,
+            };
+            // const response = await axios.post('/api/acompte/store', payload);
+            const response = await axios.post(`/api/account/${selectedAcompte.value.id}/apply-acompte`, payload);
+            console.log(response.data);
+            loadAccounts();
+            modalVisible.value = false
+        } catch (error) {
+            if (error.response) {
+                console.log(error.response.data);
+                alert('Erreur lors de la création de l\'acompte: ' + error.response.data.message);
+            } else {
+                console.log('Error', error.message);
+            }
+        }
+    }
+
     const selectpaymentMethod = (method) => {
         paymentMethod.value = method;
         if (method === "cash") {
@@ -167,15 +226,17 @@
             payment_id.value = 3;
         }
     };
+
     const changeDue = computed(() => {
         return (
-            amountPaidCash.value +
-            amountPaidBancontact.value +
-            amountPaidCreditcard.value +
-            amountPaidVirement.value -
-            totalAmount.value
+            (amountPaidCash.value +
+                amountPaidBancontact.value +
+                amountPaidCreditcard.value +
+                amountPaidVirement.value) -
+            initialChangeDue.value
         );
     });
+
     onMounted(async () => {
         loadAccounts();
     });
