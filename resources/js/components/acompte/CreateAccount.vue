@@ -19,7 +19,7 @@
                         <ComboboxInput
                             class="ntm w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
                             :displayValue="(person) => person ? (person.name + ' ' + person.price + ' €' ) : ''"
-                            @change="query = $event.target.value"/>
+                            @change="query = $event.target.value" />
                         <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
                             <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                         </ComboboxButton>
@@ -54,17 +54,66 @@
                     </TransitionRoot>
                 </div>
             </Combobox>
-            <div class="mb-6">
-                <label for="montant" class="block text-gray-700 text-sm font-bold mb-2">Montant de l'accompte :</label>
-                <input type="number" id="montant" v-model="acompte.montant"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    required>
+            <input type="hidden" v-model.number="payment_id" name="payment_id" />
+            <div class="flex flex-col items-center">
+                <h2 class="text-2xl font-bold mb-4">Moyens de paiement</h2>
+                <div class="flex justify-between mb-4">
+                    <!-- Paiement en espèces (cash) -->
+                    <button type="button" @click="selectpaymentMethod('cash')" :class="{
+                    'bg-green-500': paymentMethod === 'cash',
+                    'bg-gray-400': paymentMethod !== 'cash',
+                }" class="flex items-center text-white py-3 px-6 rounded-lg mr-4 hover:bg-green-600 focus:outline-none">
+                        <span class="mr-2">Cash</span>
+                        <BanknotesIcon class="h-6 w-6" />
+                    </button>
+                    <button type="button" @click="selectpaymentMethod('bancontact')" :class="{
+                    'bg-blue-500': paymentMethod === 'bancontact',
+                    'bg-gray-400': paymentMethod !== 'bancontact',
+                }" class="flex items-center text-white py-3 px-6 rounded-lg mr-4 hover:bg-blue-600 focus:outline-none">
+                        <span class="mr-2">Bancontact</span>
+                        <CreditCardIcon class="h-6 w-6" />
+                    </button>
+                    <button type="button" @click="selectpaymentMethod('credit_card')" :class="{
+                    'bg-purple-500': paymentMethod === 'credit_card',
+                    'bg-gray-400': paymentMethod !== 'credit_card',
+                }" class="flex items-center text-white py-3 px-6 rounded-lg hover:bg-purple-600 focus:outline-none">
+                        <span class="mr-2">Carte de crédit</span>
+                        <CreditCardIcon class="h-6 w-6" />
+                    </button>
+                    <button type="button" @click="selectpaymentMethod('virement')" :class="{
+                    'bg-red-300': paymentMethod === 'virement',
+                    'bg-gray-400': paymentMethod !== 'virement',
+                }" class="flex items-center text-white py-3 px-6 ml-3 rounded-lg hover:bg-red-400 focus:outline-none">
+                        <span class="mr-2">Virement</span>
+                        <CreditCardIcon class="h-6 w-6" />
+                    </button>
+                </div>
+                <div v-if="paymentMethod === 'cash'" class="flex items-center mb-4">
+                    <label for="amountPaidCash" class="mr-2">Montant payé:</label>
+                    <input id="amountPaidCash" type="number" v-model.number="amountPaidCash"
+                        class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+                </div>
+                <div v-if="paymentMethod === 'bancontact'" class="flex items-center mb-4">
+                    <label for="amountPaidBancontact" class="mr-2">Montant payé:</label>
+                    <input inputmode="numeric" id="amountPaidBancontact" type="number"
+                        v-model.number="amountPaidBancontact"
+                        class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+                </div>
+                <div v-if="paymentMethod === 'credit_card'" class="flex items-center mb-4">
+                    <label for="amountPaidCreditcard" class="mr-2">Montant payé:</label>
+                    <input id="amountPaidCreditcard" type="number" v-model.number="amountPaidCreditcard"
+                        class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+                </div>
+                <div v-if="paymentMethod === 'virement'" class="flex items-center mb-4">
+                    <label for="amountPaidVirement" class="mr-2">Montant payé:</label>
+                    <input id="amountPaidVirement" type="number" v-model.number="amountPaidVirement"
+                        class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+                </div>
             </div>
             <div class="flex items-center justify-between">
                 <button
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    type="submit">
-                    Créer un acompte
+                    class="w-full bg-blue-500 text-white py-4 rounded-lg mt-8 hover:bg-blue-600 focus:outline-none text-xl">
+                    Payer
                 </button>
             </div>
         </form>
@@ -86,7 +135,9 @@
     } from '@headlessui/vue';
     import {
         CheckIcon,
-        ChevronUpDownIcon
+        ChevronUpDownIcon,
+        BanknotesIcon,
+        CreditCardIcon
     } from '@heroicons/vue/20/solid';
 
     const people = ref([]);
@@ -96,6 +147,12 @@
         montant: '',
         person_id: '',
     });
+    const paymentMethod = ref("cash");
+    const amountPaidCash = ref(0);
+    const amountPaidBancontact = ref(0);
+    const amountPaidCreditcard = ref(0);
+    const amountPaidVirement = ref(0);
+    const payment_id = ref(null);
 
     const selected = ref(null);
     const query = ref('');
@@ -131,7 +188,6 @@
             clients.value = clientsResponse.data.data;
             const response = await axios.get('/api/productsWithoutToilettage');
             people.value = response.data.data;
-
         } catch (error) {
             console.error('Erreur lors de la récupération des données:', error);
         }
@@ -139,10 +195,16 @@
 
     const submitAcompte = async () => {
         try {
+            const montant = amountPaidCash.value + amountPaidBancontact.value + amountPaidCreditcard.value +
+                amountPaidVirement.value;
             const payload = {
                 client_id: acompte.value.client_id,
-                montant: acompte.value.montant,
-                product_id: acompte.value.person_id
+                montant: montant,
+                product_id: acompte.value.person_id,
+                cash: amountPaidCash.value,
+                bancontact: amountPaidBancontact.value,
+                credit_card: amountPaidCreditcard.value,
+                virement: amountPaidVirement.value,
             };
             if (acompte.value.product_id) {
                 payload.product_id = acompte.value.product_id;
@@ -158,5 +220,16 @@
             }
         }
     }
+
+    const selectpaymentMethod = (method) => {
+        paymentMethod.value = method;
+        if (method === "cash") {
+            payment_id.value = 1;
+        } else if (method === "bancontact") {
+            payment_id.value = 2;
+        } else if (method === "credit_card") {
+            payment_id.value = 3;
+        }
+    };
 
 </script>

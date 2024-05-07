@@ -268,7 +268,7 @@
             </div>
             <div class="grid grid-cols-1 justify-between w-full mx-1">
                 <button v-for="category in categories" :key="category.id" @click="filterByCategory(category.id)"
-                    :class="`text-white font-bold py-2 px-4 rounded m-1 ${category.color}`">
+                    :class="`text-white font-bold py-2 px-4 rounded m-1 bg-red-500`">
                     {{ category.name }}
                 </button>
             </div>

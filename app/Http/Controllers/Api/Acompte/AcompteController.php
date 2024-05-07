@@ -40,7 +40,11 @@ class AcompteController extends Controller
 
         $sale = new Sale();
         $sale->client_id = $validatedData['client_id'];
-        $sale->total_amount = $validatedData['montant'];
+        $sale->total_amount = $request->input('cash') + $request->input('bancontact') + $request->input('credit_card') + $request->input('virement');
+        $sale->cash = $request->input('cash');
+        $sale->bancontact = $request->input('bancontact');
+        $sale->credit_card = $request->input('credit_card');
+        $sale->virement = $request->input('virement');
         $sale->montant_total_htva = round($sale->total_amount / (1 + (21/100)), 2);
         $sale->amount_tva = $sale->total_amount - $sale->montant_total_htva;
         $sale->datetime = now();
@@ -58,6 +62,16 @@ public function apply(Request $request, $accountId)
         $acompte->status = 'appliqué';
         $acompte->save();
     });
+    $sale = new Sale();
+        $sale->total_amount = $request->input('cash') + $request->input('bancontact') + $request->input('credit_card') + $request->input('virement');
+        $sale->cash = $request->input('cash');
+        $sale->bancontact = $request->input('bancontact');
+        $sale->credit_card = $request->input('credit_card');
+        $sale->virement = $request->input('virement');
+        $sale->montant_total_htva = round($sale->total_amount / (1 + (21/100)), 2);
+        $sale->amount_tva = $sale->total_amount - $sale->montant_total_htva;
+        $sale->datetime = now();
+        $sale->save();
 
     return response()->json(['message' => 'Acompte appliqué avec succès à la vente'], 200);
 }

@@ -22,16 +22,77 @@
                 <button class="text-gray-600" @click="modalVisible = false">&times;</button>
             </div>
             <p class="my-4">Changer le statut de l'acompte pour : {{ selectedAcompte.product.name }}</p>
-            <div class="grid grid-cols-2">
-                <button @click="validateAcompte"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <input type="hidden" v-model.number="payment_id" name="payment_id" />
+            <div class="flex flex-col items-center">
+                <h2 class="text-2xl font-bold mb-4">Moyens de paiement</h2>
+                <div class="flex justify-between mb-4">
+                    <!-- Paiement en espèces (cash) -->
+                    <button type="button" @click="selectpaymentMethod('cash')" :class="{
+                    'bg-green-500': paymentMethod === 'cash',
+                    'bg-gray-400': paymentMethod !== 'cash',
+                }" class="flex items-center text-white py-3 px-6 rounded-lg mr-4 hover:bg-green-600 focus:outline-none">
+                        <span class="mr-2">Cash</span>
+                        <BanknotesIcon class="h-6 w-6" />
+                    </button>
+                    <button type="button" @click="selectpaymentMethod('bancontact')" :class="{
+                    'bg-blue-500': paymentMethod === 'bancontact',
+                    'bg-gray-400': paymentMethod !== 'bancontact',
+                }" class="flex items-center text-white py-3 px-6 rounded-lg mr-4 hover:bg-blue-600 focus:outline-none">
+                        <span class="mr-2">Bancontact</span>
+                        <CreditCardIcon class="h-6 w-6" />
+                    </button>
+                    <button type="button" @click="selectpaymentMethod('credit_card')" :class="{
+                    'bg-purple-500': paymentMethod === 'credit_card',
+                    'bg-gray-400': paymentMethod !== 'credit_card',
+                }" class="flex items-center text-white py-3 px-6 rounded-lg hover:bg-purple-600 focus:outline-none">
+                        <span class="mr-2">Carte de crédit</span>
+                        <CreditCardIcon class="h-6 w-6" />
+                    </button>
+                    <button type="button" @click="selectpaymentMethod('virement')" :class="{
+                    'bg-red-300': paymentMethod === 'virement',
+                    'bg-gray-400': paymentMethod !== 'virement',
+                }" class="flex items-center text-white py-3 px-6 ml-3 rounded-lg hover:bg-red-400 focus:outline-none">
+                        <span class="mr-2">Virement</span>
+                        <CreditCardIcon class="h-6 w-6" />
+                    </button>
+                </div>
+                <div v-if="paymentMethod === 'cash'" class="flex items-center mb-4">
+                    <label for="amountPaidCash" class="mr-2">Montant payé:</label>
+                    <input id="amountPaidCash" type="number" v-model.number="amountPaidCash"
+                        class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+                </div>
+                <div v-if="paymentMethod === 'bancontact'" class="flex items-center mb-4">
+                    <label for="amountPaidBancontact" class="mr-2">Montant payé:</label>
+                    <input inputmode="numeric" id="amountPaidBancontact" type="number"
+                        v-model.number="amountPaidBancontact"
+                        class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+                </div>
+                <div v-if="paymentMethod === 'credit_card'" class="flex items-center mb-4">
+                    <label for="amountPaidCreditcard" class="mr-2">Montant payé:</label>
+                    <input id="amountPaidCreditcard" type="number" v-model.number="amountPaidCreditcard"
+                        class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+                </div>
+                <div v-if="paymentMethod === 'virement'" class="flex items-center mb-4">
+                    <label for="amountPaidVirement" class="mr-2">Montant payé:</label>
+                    <input id="amountPaidVirement" type="number" v-model.number="amountPaidVirement"
+                        class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <button v-if="changeDue === 0"
+                    class="w-full bg-blue-500 text-white py-4 rounded-lg mt-8 hover:bg-blue-600 focus:outline-none text-xl">
                     Payé
                 </button>
-                <button @click="cancel" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                <span v-if="changeDue > 0" class="ml-4 text-blue-500">Montant à rendre: {{ changeDue }} €</span>
+                <span v-if="changeDue < 0" class="ml-4 text-red-500">Reste à payer: {{ Math.abs(changeDue) }} €</span>
+                <span v-if="changeDue === 0" class="ml-4 text-green-500">Compte juste</span>
+            </div>
+            <div class="flex items-center justify-between mt-5">
+                <button type="button" @click="cancel"
+                    class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                     Remboursé
                 </button>
             </div>
-
         </div>
     </div>
 </template>
@@ -45,6 +106,12 @@
     const acomptes = ref([]);
     const modalVisible = ref(false);
     const selectedAcompte = ref(null);
+    const paymentMethod = ref("cash");
+    const amountPaidCash = ref(0);
+    const amountPaidBancontact = ref(0);
+    const amountPaidCreditcard = ref(0);
+    const amountPaidVirement = ref(0);
+    const payment_id = ref(null);
     const showModal = (acompte) => {
         selectedAcompte.value = acompte;
         modalVisible.value = true;
@@ -90,6 +157,25 @@
             console.error('Il y a eu un problème lors de la récupération des acomptes:', error);
         }
     }
+    const selectpaymentMethod = (method) => {
+        paymentMethod.value = method;
+        if (method === "cash") {
+            payment_id.value = 1;
+        } else if (method === "bancontact") {
+            payment_id.value = 2;
+        } else if (method === "credit_card") {
+            payment_id.value = 3;
+        }
+    };
+    const changeDue = computed(() => {
+        return (
+            amountPaidCash.value +
+            amountPaidBancontact.value +
+            amountPaidCreditcard.value +
+            amountPaidVirement.value -
+            totalAmount.value
+        );
+    });
     onMounted(async () => {
         loadAccounts();
     });

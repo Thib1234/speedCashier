@@ -16,7 +16,6 @@
                     {{ category.name }}
                 </button>
             </div>
-
             <div v-if="filteredProducts.length === 0" class="empty-state text-gray-500 text-center">
                 Aucun produit trouvé.
             </div>
