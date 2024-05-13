@@ -12,7 +12,7 @@
             </div>
             <div class="grid grid-cols-6 justify-between w-full mx-1">
                 <button v-for="category in categories" :key="category.id" @click="filterByCategory(category.id)"
-                    class= "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded m-1 ">
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded m-1 ">
                     {{ category.name }}
                 </button>
             </div>
@@ -25,9 +25,6 @@
                     class="product-card bg-white p-6 rounded-lg shadow transition duration-300 hover:shadow-lg">
                     <h2 class="product-name text-2xl font-bold mb-2">{{ product.name }}</h2>
                     <p class="product-price text-lg text-gray-700">{{ product.price }} €</p>
-                    <p v-if="product.stock > 0" class="product-stock text-sm text-gray-700">
-                        Stock : {{ product.stock }}
-                    </p>
                 </div>
             </div>
             <div v-if="displayedProducts.length < filteredProducts.length" class="load-more mt-6 text-center">
@@ -147,9 +144,6 @@
                     class="flex justify-between items-center bg-gray-100 p-6 mb-4 rounded-lg">
                     <div class="text-lg">{{ item.product.name }}</div>
                     <div class="text-lg">{{ item.product.price }} €</div>
-                    <div v-if="item.product.stock >= 0 && item.product.stock" class="text-xs">
-                        stock : {{ item.product.stock }}
-                    </div>
                     <div class="flex items-center">
                         <button @click="removeFromCart(index)"
                             class="text-red-500 font-bold focus:outline-none text-lg">
@@ -276,7 +270,7 @@
         loadFromServer();
     });
     const payment_id = ref(null);
-    const products = ref({});
+    const products = ref([]);
     const categories = ref(null);
     const clients = ref({});
     const client_id = ref(null);
@@ -298,7 +292,7 @@
     const tempProductName = ref(null);
     const tempProductPrice = ref(null);
     const currentCategoryId = ref(null);
-    const maxDisplayedProducts = ref(12);
+    const maxDisplayedProducts = ref(15);
     const displayedProducts = ref([]);
 
     const updateDisplayedProducts = () => {
@@ -307,10 +301,13 @@
             maxDisplayedProducts.value
         );
     };
+
     const updateFilteredProducts = () => {
-        const filtered = filteredProducts.value.filter((product) =>
+        // console.log(searchQuery.value);
+        const filtered = products.value.filter((product) =>
             product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
         );
+        console.log(filtered);
         filteredProducts.value = filtered;
         updateDisplayedProducts();
     };
@@ -338,9 +335,9 @@
     const loadFromServer = async () => {
         try {
             const response = await axios.get('/api/productsShow');
-            products.value = response.data.products
-                .data;
+            products.value = response.data.products.data;
             categories.value = response.data.categories.data;
+            console.log(categories.value);
             filterByCategory(null);
         } catch (error) {
             console.error(error);
@@ -446,8 +443,6 @@
             virement: amountPaidVirement.value,
         };
 
-        console.log("Données à envoyer:", requestData);
-
         await axios
             .post("/api/sales", requestData)
             .then((response) => {
@@ -483,7 +478,7 @@
         client_id.value = null;
     };
     const showMore = () => {
-        maxDisplayedProducts.value += 6;
+        maxDisplayedProducts.value += 5;
     };
 
     const confirmPayment = () => {
@@ -514,22 +509,21 @@
                 );
             });
     };
-
     const filterByCategory = (categoryId) => {
-        if (categoryId === currentCategoryId.value) {
-            currentCategoryId.value = null;
-        } else {
-            currentCategoryId.value = categoryId;
-        }
-        if (currentCategoryId.value === null) {
-            filteredProducts.value = Object.values(products.value);
-        } else {
-            filteredProducts.value = Object.values(products.value).filter(product => product.category_id ===
-                currentCategoryId.value);
-        }
+    if (categoryId === currentCategoryId.value) {
+        currentCategoryId.value = null;
+    } else {
+        currentCategoryId.value = categoryId;
+    }
+    if (currentCategoryId.value === null) {
+        filteredProducts.value = [...products.value];
+    } else {
+        filteredProducts.value = products.value.filter(product => product.category_id ===
+            currentCategoryId.value);
+    }
+    updateFilteredProducts();
+    updateDisplayedProducts();
+};
 
-        updateFilteredProducts();
-        updateDisplayedProducts();
-    };
 
 </script>

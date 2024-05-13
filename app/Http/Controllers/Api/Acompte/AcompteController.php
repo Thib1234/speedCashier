@@ -26,8 +26,14 @@ class AcompteController extends Controller
             'product_id' => 'required|exists:products,id',
         ]);
 
+        //On check si le produit est en stock, pour par exemple si le client veut réserver le produit alors qu'il est déjà en stock
         $prod = Product::find($request->input('product_id'));
-
+        if ($prod->stock > 0){
+            $prod->stock -= 1;
+            $prod->save();
+            // return response()->json($prod->stock);
+        }
+		
         $acompte = new Acompte();
         $acompte->client_id = $validatedData['client_id'];
         $acompte->montant = $validatedData['montant'];
@@ -52,14 +58,14 @@ class AcompteController extends Controller
         return response()->json(['message' => 'Acompte et vente créés avec succès', 'acompte_id' => $acompte->id, 'sale_id' => $sale->id], 201);
     }
 
-public function apply(Request $request, $accountId)
-{
-    DB::transaction(function () use ($accountId, $request) {
-        $acompte = Acompte::findOrFail($accountId);
-        $acompte->status = 'appliqué';
-        $acompte->save();
-    });
-    $sale = new Sale();
+    public function apply(Request $request, $accountId)
+    {
+        DB::transaction(function () use ($accountId, $request) {
+            $acompte = Acompte::findOrFail($accountId);
+            $acompte->status = 'appliqué';
+            $acompte->save();
+        });
+        $sale = new Sale();
         $sale->total_amount = $request->input('cash') + $request->input('bancontact') + $request->input('credit_card') + $request->input('virement');
         $sale->cash = $request->input('cash');
         $sale->bancontact = $request->input('bancontact');
@@ -70,8 +76,8 @@ public function apply(Request $request, $accountId)
         $sale->datetime = now();
         $sale->save();
 
-    return response()->json(['message' => 'Acompte appliqué avec succès à la vente'], 200);
-}
+        return response()->json(['message' => 'Acompte appliqué avec succès à la vente'], 200);
+    }
 
     public function cancel(Request $request, $accountId)
     {

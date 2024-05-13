@@ -116,7 +116,11 @@
                     Payer
                 </button>
             </div>
+
         </form>
+        <div v-if="success" class="fixed top-5 right-5 bg-green-200 text-green-800 text-sm px-4 py-3 rounded">
+            Accompte créé avec succès
+        </div>
     </div>
 </template>
 <script setup>
@@ -153,6 +157,7 @@
     const amountPaidCreditcard = ref(0);
     const amountPaidVirement = ref(0);
     const payment_id = ref(null);
+    const success = ref(false);
 
     const selected = ref(null);
     const query = ref('');
@@ -211,6 +216,12 @@
             }
             const response = await axios.post('/api/acompte/store', payload);
             console.log(response.data);
+            acompte.value.client_id = null;
+            selected.value = null;
+            success.value = true;
+            setTimeout(() => {
+                success.value = false;
+            }, 3000);
         } catch (error) {
             if (error.response) {
                 console.log(error.response.data);

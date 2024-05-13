@@ -14,7 +14,7 @@
             <div class="grid grid-cols-4 gap-2 text-xs font-medium">
               <div>Cash: {{ stat.cash }} €</div>
               <div>Bancontact: {{ stat.bancontact }} €</div>
-              <div>Crédit: {{ stat.credit_card }} €</div>
+              <div>Carte de crédit: {{ stat.credit_card }} €</div>
               <div>Virement: {{ stat.virement }} €</div>
             </div>
           </div>
@@ -38,4 +38,9 @@ const props = defineProps({
   totalSalesHtva: Number,
   totalHtva: Number
 });
+
+const test = () => {
+  console.log(props);
+}
+test()
 </script>

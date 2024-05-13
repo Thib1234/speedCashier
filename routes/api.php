@@ -46,7 +46,7 @@ Route::group(['middleware' =>['auth:sanctum']], function(){
     route::get('stats', \App\Http\Controllers\Api\Compta\StatsController::class)->name('compta.stats');
     route::get('stats-toilettage', \App\Http\Controllers\Api\StatToilettage\StatsController::class)->name('compta.stats-toilettage');
 
-    route::post('pdf', \App\Http\Controllers\Api\Pdf\TicketController::class)->name('ticket.create');
+    route::post('pdf', \App\Http\Controllers\Api\Pdf\TicketController::class)->name('ticket.create');// todo
 });
 
 route::post('register', \App\Http\Controllers\Api\Auth\RegisterController::class)->name('users.store');

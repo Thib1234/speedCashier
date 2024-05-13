@@ -51,6 +51,16 @@
                 </form>
             </div>
         </div>
+        <div v-if="success" class="fixed top-5 right-5 bg-green-200 text-green-800 text-sm px-4 py-3 rounded">
+            Produit mis à jour avec succès
+        </div>
+        <div v-if="successToggleActive"
+            class="fixed top-5 right-5 bg-green-200 text-green-800 text-sm px-4 py-3 rounded">
+            Produit activé
+        </div>
+        <div v-if="successToggleDisabled" class="fixed top-5 right-5 bg-red-200 text-red-800 text-sm px-4 py-3 rounded">
+            Produit désactivé
+        </div>
     </div>
 </template>
 
@@ -60,27 +70,32 @@
     } from "vue";
     const products = ref([]);
     const categories = ref([]);
+    const success = ref(false);
+    const successToggleActive = ref(false);
+    const successToggleDisabled = ref(false);
+
     const loadFromServer = async () => {
         try {
             const response = await axios.get('/api/products');
-            products.value = response.data.products
-                .data; // Accédez directement à la propriété 'products' de la réponse
+            products.value = response.data.products.data;
             categories.value = response.data.categories.data;
-            console.log(products.value);
-            console.log(categories.value);
         } catch (error) {
             console.error(error);
         }
     };
 
-    const getCategoryName = (categoryId) => {
-        const category = categories.value.find(cat => cat.id === categoryId);
-        return category ? category.name : '';
-    };
+    // const getCategoryName = (categoryId) => {
+    //     const category = categories.value.find(cat => cat.id === categoryId);
+    //     return category ? category.name : '';
+    // };
     const updateProduct = async (product) => {
         try {
             await axios.put(`/api/products/${product.id}`, product);
             console.log("Product updated successfully");
+            success.value = true;
+            setTimeout(() => {
+                success.value = false;
+            }, 3000);
         } catch (error) {
             console.error(error);
         }
@@ -88,47 +103,23 @@
     const updateActive = async (product) => {
         try {
             await axios.put(`/api/activeProduct/${product.id}`, product);
-            console.log('ok');
+            if (product.active) {
+                successToggleActive.value = true
+            } else {
+                successToggleDisabled.value = true
+            }
+            setTimeout(() => {
+                successToggleDisabled.value = false;
+                successToggleActive.value = false;
+            }, 3000);
         } catch (error) {
             console.error(error);
         }
     };
     const toggleActiveProduct = async (product) => {
-        product.active = product.active === 0 ? 1 : 0; // Inversion de l'état actif
+        product.active = product.active === 0 ? 1 : 0;
         await updateActive(product);
     };
-
     loadFromServer();
 
 </script>
-
-<style scoped>
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    button {
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    button,
-    textarea {
-        border-radius: 0.375rem;
-    }
-
-    button {
-        cursor: pointer;
-    }
-
-    button:hover {
-        opacity: 0.8;
-    }
-
-</style>
