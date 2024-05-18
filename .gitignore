@@ -8,6 +8,7 @@
 .env
 .env.backup
 .env.production
+.env prod
 .env copy.production
 .env.a.garder
 .phpunit.result.cache

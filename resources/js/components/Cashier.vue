@@ -231,7 +231,7 @@
         </div>
         <div v-if="paymentMethod === 'cash'" class="flex items-center mb-4">
             <label for="amountPaidCash" class="mr-2">Montant payé:</label>
-            <input id="amountPaidCash" type="number" v-model.number="amountPaidCash"
+            <input inputmode="numeric" id="amountPaidCash" type="number" v-model.number="amountPaidCash"
                 class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
         </div>
         <div v-if="paymentMethod === 'bancontact'" class="flex items-center mb-4">
@@ -241,12 +241,12 @@
         </div>
         <div v-if="paymentMethod === 'credit_card'" class="flex items-center mb-4">
             <label for="amountPaidCreditcard" class="mr-2">Montant payé:</label>
-            <input id="amountPaidCreditcard" type="number" v-model.number="amountPaidCreditcard"
+            <input inputmode="numeric" id="amountPaidCreditcard" type="number" v-model.number="amountPaidCreditcard"
                 class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
         </div>
         <div v-if="paymentMethod === 'virement'" class="flex items-center mb-4">
             <label for="amountPaidVirement" class="mr-2">Montant payé:</label>
-            <input id="amountPaidVirement" type="number" v-model.number="amountPaidVirement"
+            <input inputmode="numeric" id="amountPaidVirement" type="number" v-model.number="amountPaidVirement"
                 class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
         </div>
         <span v-if="changeDue > 0" class="ml-4 text-blue-500">Montant à rendre: {{ changeDue }} €</span>
@@ -510,6 +510,7 @@
             });
     };
     const filterByCategory = (categoryId) => {
+        console.log(categoryId);
     if (categoryId === currentCategoryId.value) {
         currentCategoryId.value = null;
     } else {

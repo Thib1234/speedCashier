@@ -1,6 +1,6 @@
 <template>
     <header class="bg-white">
-        <nav class="mx-auto flex max-w-2xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+        <nav class="mx-auto flex max-w-2xl items-center justify-between p-1 lg:px-4" aria-label="Global">
             <div class="flex lg:flex-1">
                 <a href="/cashier" class="-m-1.5 p-1.5">
                     <h1>Speed Cashier</h1>
@@ -141,6 +141,38 @@
                         </PopoverPanel>
                     </transition>
                 </Popover>
+                <Popover class="relative">
+                    <PopoverButton class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
+                        Factures
+                        <ChevronDownIcon class="h-5 w-5 flex-none text-gray-400" aria-hidden="true" />
+                    </PopoverButton>
+                    <transition enter-active-class="transition ease-out duration-200"
+                        enter-from-class="opacity-0 translate-y-1" enter-to-class="opacity-100 translate-y-0"
+                        leave-active-class="transition ease-in duration-150"
+                        leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-1">
+                        <PopoverPanel
+                            class="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
+                            <div class="p-4">
+                                <div v-for="item in factures" :key="item.name"
+                                    class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50">
+                                    <div
+                                        class="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
+                                        <component :is="item.icon"
+                                            class="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
+                                            aria-hidden="true" />
+                                    </div>
+                                    <div class="flex-auto">
+                                        <a :href="item.href" class="block font-semibold text-gray-900">
+                                            {{ item.name }}
+                                            <span class="absolute inset-0" />
+                                        </a>
+                                        <p class="mt-1 text-gray-600">{{ item.description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </PopoverPanel>
+                    </transition>
+                </Popover>
             </PopoverGroup>
         </nav>
         <Dialog as="div" class="lg:hidden" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
@@ -212,7 +244,9 @@
         ShoppingBagIcon,
         XMarkIcon,
         CalculatorIcon,
-        ChartBarIcon
+        ChartBarIcon,
+        Square3Stack3DIcon,
+        DocumentPlusIcon,
     } from '@heroicons/vue/24/outline'
     import {
         ChevronDownIcon,
@@ -280,6 +314,19 @@
             description: "Création d'un nouvel acompte",
             href: '/account/create',
             icon: ChartBarIcon,
+        },
+    ]
+    const factures = [{
+            name: 'Créer un facture',
+            description: 'Création d\'une nouvelle facture pour une vente',
+            href: '/facture/create',
+            icon: DocumentPlusIcon,
+        },
+        {
+            name: 'Liste des factures',
+            description: 'Liste de toutes les factures',
+            href: '/factures',
+            icon: Square3Stack3DIcon,
         },
     ]
 
