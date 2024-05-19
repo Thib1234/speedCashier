@@ -12,9 +12,13 @@
             </div>
             <div class="grid grid-cols-6 justify-between w-full mx-1">
                 <button v-for="category in categories" :key="category.id" @click="filterByCategory(category.id)"
-                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded m-1 ">
-                    {{ category.name }}
-                </button>
+          :class="{
+            'bg-gray-300 hover:bg-gray-400': currentCategoryId !== category.id,
+            'bg-red-400 hover:bg-gray-500': currentCategoryId === category.id
+          }"
+          class="text-gray-800 font-bold py-2 px-4 rounded m-1">
+          {{ category.name }}
+        </button>
             </div>
             <div v-if="filteredProducts.length === 0" class="empty-state text-gray-500 text-center">
                 Aucun produit trouvé.
@@ -256,275 +260,211 @@
     </div>
 </template>
 <script setup>
-    import {
-        ref,
-        computed,
-        watchEffect,
-        onMounted,
-    } from "vue";
-    import {
-        BanknotesIcon,
-        CreditCardIcon
-    } from "@heroicons/vue/24/outline";
-    onMounted(() => {
-        loadFromServer();
-    });
-    const payment_id = ref(null);
-    const products = ref([]);
-    const categories = ref(null);
-    const clients = ref({});
-    const client_id = ref(null);
-    const searchQuery = ref("");
-    const searchQueryClient = ref("");
-    const cart = ref([]);
-    const paymentMethod = ref("cash");
-    const amountPaidCash = ref(0);
-    const amountPaidBancontact = ref(0);
-    const amountPaidCreditcard = ref(0);
-    const amountPaidVirement = ref(0);
-    const showPopup = ref(false);
-    const showPopUpTempProduct = ref(false);
-    const filteredProducts = ref([]);
-    const filteredClients = ref([]);
-    const sale_id = ref(null);
-    const showConfirmationModal = ref(false);
-    const temporaryProducts = ref([]);
-    const tempProductName = ref(null);
-    const tempProductPrice = ref(null);
-    const currentCategoryId = ref(null);
-    const maxDisplayedProducts = ref(15);
-    const displayedProducts = ref([]);
+import { ref, computed, onMounted, watchEffect } from "vue";
+import { BanknotesIcon, CreditCardIcon } from "@heroicons/vue/24/outline";
 
-    const updateDisplayedProducts = () => {
-        displayedProducts.value = filteredProducts.value.slice(
-            0,
-            maxDisplayedProducts.value
-        );
-    };
+const payment_id = ref(null);
+const products = ref([]);
+const categories = ref(null);
+const clients = ref({});
+const client_id = ref(null);
+const searchQuery = ref("");
+const searchQueryClient = ref("");
+const cart = ref([]);
+const paymentMethod = ref("cash");
+const amountPaidCash = ref(0);
+const amountPaidBancontact = ref(0);
+const amountPaidCreditcard = ref(0);
+const amountPaidVirement = ref(0);
+const showPopup = ref(false);
+const showPopUpTempProduct = ref(false);
+const filteredClients = ref([]);
+const sale_id = ref(null);
+const showConfirmationModal = ref(false);
+const temporaryProducts = ref([]);
+const tempProductName = ref(null);
+const tempProductPrice = ref(null);
+const currentCategoryId = ref(null);
+const maxDisplayedProducts = ref(15);
 
-    const updateFilteredProducts = () => {
-        // console.log(searchQuery.value);
-        const filtered = products.value.filter((product) =>
+const filteredProducts = computed(() => {
+    if (currentCategoryId.value === null) {
+        return products.value.filter(product =>
             product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
         );
-        console.log(filtered);
-        filteredProducts.value = filtered;
-        updateDisplayedProducts();
-    };
-
-    const addTemporaryProduct = (name, price) => {
-        // Générer un ID temporaire unique pour chaque produit temporaire
-        const tempProductId = "_" + Math.random().toString(36).substr(2, 9);
-
-        const tempProduct = {
-            id: tempProductId,
-            name: name,
-            price: price,
-        };
-        temporaryProducts.value.push(tempProduct);
-
-        const productCopy = {
-            ...tempProduct,
-        };
-
-        addToCart(productCopy);
-        tempProductName.value = null;
-        tempProductPrice.value = null;
-    };
-
-    const loadFromServer = async () => {
-        try {
-            const response = await axios.get('/api/productsShow');
-            products.value = response.data.products.data;
-            categories.value = response.data.categories.data;
-            console.log(categories.value);
-            filterByCategory(null);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const addtotal = () => {
-        if (paymentMethod.value === "cash") {
-            amountPaidCash.value = Math.abs(changeDue.value);
-        } else if (paymentMethod.value === "bancontact") {
-            amountPaidBancontact.value = Math.abs(changeDue.value);
-        } else if (paymentMethod.value === "credit_card") {
-            amountPaidCreditcard.value = Math.abs(changeDue.value);
-        } else if (paymentMethod.value === "virement") {
-            amountPaidVirement.value = Math.abs(changeDue.value);
-        }
-    };
-
-    const totalAmount = computed(() => {
-        return cart.value.reduce(
-            (total, item) => total + item.product.price * item.quantity,
-            0
-        );
-    });
-
-    const changeDue = computed(() => {
-        return (
-            amountPaidCash.value +
-            amountPaidBancontact.value +
-            amountPaidCreditcard.value +
-            amountPaidVirement.value -
-            totalAmount.value
-        );
-    });
-
-    const selectpaymentMethod = (method) => {
-        paymentMethod.value = method;
-        if (method === "cash") {
-            payment_id.value = 1;
-        } else if (method === "bancontact") {
-            payment_id.value = 2;
-        } else if (method === "credit_card") {
-            payment_id.value = 3;
-        }
-    };
-
-    const updateFilteredClients = () => {
-        const filtered = Object.values(clients.value).filter((client) =>
-            client.name
-            .toLowerCase()
-            .includes(searchQueryClient.value.toLowerCase())
-        );
-        filteredClients.value = filtered;
-    };
-    const addClient = (client) => {
-        console.log(client.id);
-        client_id.value = client.id;
-    };
-
-    const addToCart = (product) => {
-        const existingItem = cart.value.find(
-            (item) => item.product.id === product.id
-        );
-        if (existingItem) {
-            existingItem.quantity++;
-        } else {
-            if (typeof product.price !== "undefined") {
-                cart.value.push({
-                    product: {
-                        ...product,
-                        price: product.price,
-                    },
-                    quantity: 1,
-                });
-            } else {
-                console.error("Le prix du produit est indéfini.");
-            }
-        }
-    };
-
-    const removeFromCart = (index) => {
-        const item = cart.value[index];
-        if (item.quantity > 1) {
-            item.quantity--;
-        } else {
-            cart.value.splice(index, 1);
-        }
-    };
-
-    const sendSaleData = async () => {
-        const requestData = {
-            products: cart.value.map((item) => ({
-                id: item.product.id,
-                quantity: item.quantity,
-                price: item.product.price,
-                name: item.product.name,
-            })),
-            client_id: client_id.value,
-            total_amount: totalAmount.value,
-            cash: amountPaidCash.value,
-            bancontact: amountPaidBancontact.value,
-            credit_card: amountPaidCreditcard.value,
-            virement: amountPaidVirement.value,
-        };
-
-        await axios
-            .post("/api/sales", requestData)
-            .then((response) => {
-                resetCart();
-                loadFromServer();
-                sale_id.value = response.data.sale_id;
-                console.log("ID de la vente:", sale_id.value);
-
-                generateTicket(sale_id.value);
-            })
-            .catch((error) => {
-                console.error(
-                    "Erreur lors de l'enregistrement de la vente:",
-                    error
-                );
-            });
-    };
-
-    watchEffect(() => {
-        updateFilteredProducts();
-        updateDisplayedProducts();
-        updateFilteredClients();
-    });
-
-    const resetCart = () => {
-        cart.value = [];
-        totalAmount.value = 0;
-        changeDue.value = 0;
-        amountPaidCash.value = 0;
-        amountPaidBancontact.value = 0;
-        amountPaidCreditcard.value = 0;
-        amountPaidVirement.value = 0;
-        client_id.value = null;
-    };
-    const showMore = () => {
-        maxDisplayedProducts.value += 5;
-    };
-
-    const confirmPayment = () => {
-        showConfirmationModal.value = true;
-    };
-
-    const cancelPayment = () => {
-        sendSaleData();
-        showConfirmationModal.value = false;
-    };
-
-    const createTicketAndPay = () => {
-        sendSaleData();
-        generateTicket();
-        showConfirmationModal.value = false;
-    };
-
-    const generateTicket = (saleId) => {
-        axios
-            .post("/api/pdf", saleId)
-            .then((response) => {
-                console.log(response);
-            })
-            .catch((error) => {
-                console.error(
-                    "Erreur lors de la génération du ticket de caisse:",
-                    error
-                );
-            });
-    };
-    const filterByCategory = (categoryId) => {
-        console.log(categoryId);
-    if (categoryId === currentCategoryId.value) {
-        currentCategoryId.value = null;
     } else {
-        currentCategoryId.value = categoryId;
+        return products.value.filter(product =>
+            product.category_id === currentCategoryId.value &&
+            product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+        );
     }
-    if (currentCategoryId.value === null) {
-        filteredProducts.value = [...products.value];
-    } else {
-        filteredProducts.value = products.value.filter(product => product.category_id ===
-            currentCategoryId.value);
+});
+
+const displayedProducts = computed(() => {
+    return filteredProducts.value.slice(0, maxDisplayedProducts.value);
+});
+
+const loadFromServer = async () => {
+    try {
+        const response = await axios.get('/api/productsShow');
+        products.value = response.data.products.data;
+        categories.value = response.data.categories.data;
+        console.log("Products and Categories loaded", products.value, categories.value);
+    } catch (error) {
+        console.error("Error loading data from server:", error);
     }
-    updateFilteredProducts();
-    updateDisplayedProducts();
 };
 
+const addTemporaryProduct = (name, price) => {
+    const tempProductId = "_" + Math.random().toString(36).substr(2, 9);
+    const tempProduct = { id: tempProductId, name, price };
+    temporaryProducts.value.push(tempProduct);
+    addToCart(tempProduct);
+    tempProductName.value = null;
+    tempProductPrice.value = null;
+};
 
+const addtotal = () => {
+    if (paymentMethod.value === "cash") {
+        amountPaidCash.value = Math.abs(changeDue.value);
+    } else if (paymentMethod.value === "bancontact") {
+        amountPaidBancontact.value = Math.abs(changeDue.value);
+    } else if (paymentMethod.value === "credit_card") {
+        amountPaidCreditcard.value = Math.abs(changeDue.value);
+    } else if (paymentMethod.value === "virement") {
+        amountPaidVirement.value = Math.abs(changeDue.value);
+    }
+};
+
+const totalAmount = computed(() => {
+    return cart.value.reduce((total, item) => total + item.product.price * item.quantity, 0);
+});
+
+const changeDue = computed(() => {
+    return amountPaidCash.value + amountPaidBancontact.value + amountPaidCreditcard.value + amountPaidVirement.value - totalAmount.value;
+});
+
+const selectpaymentMethod = (method) => {
+    paymentMethod.value = method;
+    if (method === "cash") {
+        payment_id.value = 1;
+    } else if (method === "bancontact") {
+        payment_id.value = 2;
+    } else if (method === "credit_card") {
+        payment_id.value = 3;
+    }
+};
+
+const updateFilteredClients = () => {
+    const filtered = Object.values(clients.value).filter(client =>
+        client.name.toLowerCase().includes(searchQueryClient.value.toLowerCase())
+    );
+    filteredClients.value = filtered;
+};
+
+const addClient = (client) => {
+    console.log(client.id);
+    client_id.value = client.id;
+};
+
+const addToCart = (product) => {
+    const existingItem = cart.value.find(item => item.product.id === product.id);
+    if (existingItem) {
+        existingItem.quantity++;
+    } else {
+        if (typeof product.price !== "undefined") {
+            cart.value.push({ product: { ...product, price: product.price }, quantity: 1 });
+        } else {
+            console.error("Le prix du produit est indéfini.");
+        }
+    }
+};
+
+const removeFromCart = (index) => {
+    const item = cart.value[index];
+    if (item.quantity > 1) {
+        item.quantity--;
+    } else {
+        cart.value.splice(index, 1);
+    }
+};
+
+const sendSaleData = async () => {
+    const requestData = {
+        products: cart.value.map(item => ({
+            id: item.product.id,
+            quantity: item.quantity,
+            price: item.product.price,
+            name: item.product.name,
+        })),
+        client_id: client_id.value,
+        total_amount: totalAmount.value,
+        cash: amountPaidCash.value,
+        bancontact: amountPaidBancontact.value,
+        credit_card: amountPaidCreditcard.value,
+        virement: amountPaidVirement.value,
+    };
+
+    await axios.post("/api/sales", requestData)
+        .then(response => {
+            resetCart();
+            loadFromServer();
+            sale_id.value = response.data.sale_id;
+            console.log("ID de la vente:", sale_id.value);
+            generateTicket(sale_id.value);
+        })
+        .catch(error => {
+            console.error("Erreur lors de l'enregistrement de la vente:", error);
+        });
+};
+
+watchEffect(() => {
+    updateFilteredClients();
+});
+
+const resetCart = () => {
+    cart.value = [];
+    amountPaidCash.value = 0;
+    amountPaidBancontact.value = 0;
+    amountPaidCreditcard.value = 0;
+    amountPaidVirement.value = 0;
+    client_id.value = null;
+};
+
+const showMore = () => {
+    maxDisplayedProducts.value += 5;
+};
+
+const confirmPayment = () => {
+    showConfirmationModal.value = true;
+};
+
+const cancelPayment = () => {
+    sendSaleData();
+    showConfirmationModal.value = false;
+};
+
+const createTicketAndPay = () => {
+    sendSaleData();
+    generateTicket();
+    showConfirmationModal.value = false;
+};
+
+const generateTicket = (saleId) => {
+    axios.post("/api/pdf", saleId)
+        .then(response => {
+            console.log(response);
+        })
+        .catch(error => {
+            console.error("Erreur lors de la génération du ticket de caisse:", error);
+        });
+};
+
+const filterByCategory = (categoryId) => {
+    currentCategoryId.value = categoryId === currentCategoryId.value ? null : categoryId;
+};
+
+onMounted(() => {
+    loadFromServer();
+});
 </script>
