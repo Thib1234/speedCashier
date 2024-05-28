@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Client;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Models\Facture;
 use App\Models\ProductSale;
 
 class Sale extends Model
@@ -32,7 +33,6 @@ class Sale extends Model
         return $this->hasMany(ProductSale::class);
     }
 
-
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
@@ -41,5 +41,9 @@ class Sale extends Model
     {
         return $this->belongsToMany(Product::class, 'product_sale')
             ->withPivot('quantity', 'price', 'total');
+    }
+    public function facture(): HasOne
+    {
+        return $this->hasOne(Facture::class);
     }
 }

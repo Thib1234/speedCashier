@@ -31,7 +31,6 @@ class AcompteController extends Controller
         if ($prod->stock > 0){
             $prod->stock -= 1;
             $prod->save();
-            // return response()->json($prod->stock);
         }
 		
         $acompte = new Acompte();

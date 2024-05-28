@@ -12,12 +12,12 @@
             </div>
             <div class="grid grid-cols-6 justify-between w-full mx-1">
                 <button v-for="category in categories" :key="category.id" @click="filterByCategory(category.id)"
-          :class="{
+        :class="{
             'bg-gray-300 hover:bg-gray-400': currentCategoryId !== category.id,
             'bg-red-400 hover:bg-gray-500': currentCategoryId === category.id
-          }"
-          class="text-gray-800 font-bold py-2 px-4 rounded m-1">
-          {{ category.name }}
+        }"
+        class="text-gray-800 font-bold py-2 px-4 rounded m-1">
+        {{ category.name }}
         </button>
             </div>
             <div v-if="filteredProducts.length === 0" class="empty-state text-gray-500 text-center">

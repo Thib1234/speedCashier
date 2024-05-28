@@ -15,6 +15,7 @@ class ProductExcludingToilettageController extends Controller
         // Récupérer tous les produits sauf ceux de la catégorie toilettage
         $excludedCategoryName = 'Toilettage'; // Le nom de la catégorie à exclure
         $products = Product::where('active', 1)
+            ->where('stock', '>', '1')
             ->whereDoesntHave('category', function ($query) use ($excludedCategoryName) {
                 $query->where('name', $excludedCategoryName);
             })->get();

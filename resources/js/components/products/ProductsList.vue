@@ -83,11 +83,6 @@
             console.error(error);
         }
     };
-
-    // const getCategoryName = (categoryId) => {
-    //     const category = categories.value.find(cat => cat.id === categoryId);
-    //     return category ? category.name : '';
-    // };
     const updateProduct = async (product) => {
         try {
             await axios.put(`/api/products/${product.id}`, product);

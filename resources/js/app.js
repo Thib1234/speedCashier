@@ -15,6 +15,9 @@ import StatsToilettage from './components/compta/StatsToilettage.vue'
 import Show from './components/compta/Show.vue'
 import AcountsList from './components/acompte/AccountsList.vue'
 import CreateAccount from './components/acompte/CreateAccount.vue'
+import Create from './components/factures/Create.vue'
+import List from './components/factures/List.vue'
+import StockList from './components/stock/StockView.vue'
 
 const app = createApp({});
 
@@ -33,6 +36,9 @@ app.component('StatsToilettage', StatsToilettage);
 app.component('Show', Show);
 app.component('AcountsList', AcountsList);
 app.component('CreateAccount', CreateAccount);
+app.component('List', List);
+app.component('Create', Create);
+app.component('StockList', StockList);
 
 
 app.mount('#app');
