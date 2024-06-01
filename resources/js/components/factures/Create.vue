@@ -1,23 +1,67 @@
 <template>
-    <div>
-		<h1>
-			Création de Facture
-		</h1>
-        <form @submit.prevent="createFacture">
-            <div class="mb-4">
-                <label for="sale">Selectionner une vente</label>
-                <select name="sale" id="sale" v-model="formData.id">
-                    <option disabled value="">Veuillez selectionner une vente</option>
-                    <option v-for="sale in sales" :key="sale.id" :value="sale.id">{{ sale.total_amount }}</option>
-                </select>
-            </div>
-			<div class="flex items-center justify-between">
-                <button
-                    class="bg-blue-500 text-white ml-2 p-4 rounded-lg mt-8 hover:bg-blue-600 focus:outline-none text-xl">
-                    Créer la facture
+    <div class="m-6">
+        <h1 class="text-2xl font-bold mb-6">
+            Création de Facture
+        </h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div v-for="sale in sales.data" :key="sale.id" class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Vente #{{ sale.id }}</h2>
+                <p class="mb-2"><strong>Date:</strong> {{ new Date(sale.datetime).toLocaleDateString() }}</p>
+                <p class="mb-2"><strong>Total:</strong> {{ sale.total_amount }}€</p>
+                <div class="mb-4">
+                    <strong>Articles:</strong>
+                    <ul>
+                        <li v-for="product in sale.products" :key="product.id">
+                            {{ product.name }} - {{ product.pivot.quantity }} x {{ product.pivot.price }}€
+                        </li>
+                    </ul>
+                </div>
+                <button @click="selectSale(sale.id)"
+                    class="bg-blue-500 text-white w-full py-2 rounded-lg hover:bg-blue-600 focus:outline-none">
+                    Sélectionner cette vente
                 </button>
             </div>
-        </form>
+            <div class="flex justify-center mt-8">
+                <button v-if="sales.prev_page_url" @click="loadFromServer(sales.prev_page_url)"
+                    class="bg-gray-500 text-white py-2 px-4 rounded-lg mr-2">
+                    Précédent
+                </button>
+                <button v-if="sales.next_page_url" @click="loadFromServer(sales.next_page_url)"
+                    class="bg-gray-500 text-white py-2 px-4 rounded-lg">
+                    Suivant
+                </button>
+            </div>
+        </div>
+    </div>
+    <div v-if="isModalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="my-modal">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Associer Client et Créer Facture</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500">Vente ID: {{ selectedSaleId }}</p>
+                    <form @submit.prevent="associateClientAndCreateFacture">
+                        <div class="mb-4">
+                            <label for="client" class="block text-gray-700 text-sm font-bold mb-2">Client:</label>
+                            <input type="text" id="client" v-model="clientName" placeholder="Nom du client"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+                        <div class="flex items-center justify-end p-6 border-t border-solid border-gray-300 rounded-b">
+                            <button
+                                class="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
+                                type="submit">
+                                Associer et Créer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button @click="closeModal" id="ok-btn"
+                        class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                        Fermer
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -26,23 +70,51 @@
         ref,
         onMounted
     } from 'vue';
-	const formData = ref({
+    const formData = ref({
         id: '',
     })
-    const sales = ref(null);
-    const loadFromServer = async () => {
+    const sales = ref({
+        data: []
+    });
+    const clients= ref({
+        data: []
+    });
+
+    const isModalOpen = ref(false);
+    const selectedSaleId = ref(null);
+    const clientName = ref('');
+
+    const selectSale = (saleId) => {
+        selectedSaleId.value = saleId;
+        isModalOpen.value = true;
+    };
+
+    const closeModal = () => {
+        isModalOpen.value = false;
+    };
+
+    const associateClientAndCreateFacture = async () => {
+        console.log(selectedSaleId.value);
+
+
+        closeModal();
+    };
+
+    const loadFromServer = async (url = '/api/factures/create') => {
         try {
-            const response = await axios.get('/api/factures/create');
-            sales.value = response.data;
-            console.log(sales.value);
+            const response = await axios.get(url);
+            sales.value = response.data.sales;
+            clients.value = response.data.clients;
+            console.log(clients.value);
+
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
+    };
+    const createFacture = async () => {
+        const response = await axios.post('/api/factures/store', formData.value);
+        console.log(response);
     }
-	const createFacture = async () => {
-		const response = await axios.post('/api/factures/store', formData.value);
-		console.log(response);
-	}
 
     onMounted(async () => {
         loadFromServer();
