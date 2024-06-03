@@ -12,6 +12,7 @@ class Client extends Model
 
     protected $fillable = [
         'name',
+        'email',
     ];
 
     public function sales(): HasMany
@@ -22,6 +23,11 @@ class Client extends Model
     public function acomptes(): HasMany
 {
     return $this->hasMany(Acompte::class);
+}
+
+public function factures(): HasMany
+{
+    return $this->hasMany(Facture::class);
 }
 
 }

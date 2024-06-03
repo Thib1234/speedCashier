@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Sale;
+use App\Models\Client;
 
 
 class Facture extends Model
@@ -15,9 +17,16 @@ class Facture extends Model
 		'send',
     ];
 
-    public function sale(): HasOne
+    public function sale(): BelongsTo
+{
+    return $this->belongsTo(Sale::class);
+}
+
+
+    public function client(): BelongsTo
     {
-        return $this->hasOne(Sale::class);
+        return $this->belongsTo(Client::class);
     }
+
 
 }

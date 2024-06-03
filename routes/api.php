@@ -26,6 +26,7 @@ Route::group(['middleware' =>['auth:sanctum']], function(){
 
     Route::get('/factures/create', \App\Http\Controllers\Api\Facture\CreateController::class)->name('facture.create');
     Route::post('/factures/store', \App\Http\Controllers\Api\Facture\StoreController::class)->name('facture.store');
+    Route::get('/factures/list', \App\Http\Controllers\Api\Facture\ListController::class)->name('facture.list');
 
     route::get('clients', \App\Http\Controllers\Api\Client\IndexController::class)->name('clients.index');
     route::post('clients', \App\Http\Controllers\Api\Client\StoreController::class)->name('clients.store');

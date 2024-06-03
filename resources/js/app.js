@@ -17,6 +17,7 @@ import AcountsList from './components/acompte/AccountsList.vue'
 import CreateAccount from './components/acompte/CreateAccount.vue'
 import Create from './components/factures/Create.vue'
 import List from './components/factures/List.vue'
+import ListInvoices from './components/factures/ListInvoices.vue'
 import StockList from './components/stock/StockView.vue'
 
 const app = createApp({});
@@ -39,6 +40,7 @@ app.component('CreateAccount', CreateAccount);
 app.component('List', List);
 app.component('Create', Create);
 app.component('StockList', StockList);
+app.component('ListInvoices', ListInvoices);
 
 
 app.mount('#app');

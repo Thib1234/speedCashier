@@ -6,26 +6,39 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Sale;
 use App\Models\Facture;
+use App\Models\Client;
 use Illuminate\Http\JsonResponse;
 
 class StoreController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
-
 	public function __invoke(Request $request): JsonResponse
-    {
-		// return response()->json($request);
-        $validated = $request->validate([
-            'id' => 'required|integer',
-        ]);
+{
+    $validated = $request->validate([
+        'client_id' => 'required|integer',
+        'sale_id' => 'required|integer',
+    ]);
 
-        $facture = Facture::create($validated);
+    $client = Client::find($validated['client_id']);
+    $sale = Sale::find($validated['sale_id']);
+
+    if ($client && $sale) {
+        $facture = new Facture;
+        $facture->client_id = $client->id;
+        $facture->sale_id = $sale->id;
+        $facture->date_facture = now()->toDateString();
+        // Ajoutez ici d'autres champs si nécessaire
+        $facture->save();
 
         return response()->json([
             'success' => true,
             'facture' => $facture,
         ]);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'Client ou vente non trouvé',
+        ]);
     }
+}
+
 }

@@ -17,6 +17,7 @@ class StoreController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string',
+            'email' => 'required|email',
         ]);
 
         $client = Client::create($validated);

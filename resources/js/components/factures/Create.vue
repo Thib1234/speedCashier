@@ -42,16 +42,16 @@
                     <form @submit.prevent="associateClientAndCreateFacture">
                         <div class="mb-4">
                             <label for="client" class="block text-gray-700 text-sm font-bold mb-2">Client:</label>
-                            <input type="text" id="client" v-model="clientName" placeholder="Nom du client"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <select name="client" id="client" v-model="selectedClientId">
+                                <option v-for="client in clients" :value="client.id">{{client.name}}</option>
+                            </select>
                         </div>
-                        <div class="flex items-center justify-end p-6 border-t border-solid border-gray-300 rounded-b">
-                            <button
-                                class="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
-                                type="submit">
-                                Associer et Créer
-                            </button>
-                        </div>
+
+                        <button
+                            class="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
+                            type="submit">
+                            Associer et Créer
+                        </button>
                     </form>
                 </div>
                 <div class="items-center px-4 py-3">
@@ -76,9 +76,10 @@
     const sales = ref({
         data: []
     });
-    const clients= ref({
+    const clients = ref({
         data: []
     });
+    const selectedClientId = ref(null);
 
     const isModalOpen = ref(false);
     const selectedSaleId = ref(null);
@@ -95,10 +96,25 @@
 
     const associateClientAndCreateFacture = async () => {
         console.log(selectedSaleId.value);
+        console.log(selectedClientId.value);
+        const requestData = {
+            client_id: selectedClientId.value,
+            sale_id: selectedSaleId.value
+        };
+        if (selectedClientId.value != null && selectedSaleId.value != null) {
+            await axios.post("/api/factures/store", requestData)
+                .then(response => {
+                    console.log(response);
+                })
+                .catch(error => {
+                    console.log(error);
+                })
 
+            closeModal();
+        }
 
-        closeModal();
     };
+
 
     const loadFromServer = async (url = '/api/factures/create') => {
         try {
@@ -111,10 +127,6 @@
             console.error(error);
         }
     };
-    const createFacture = async () => {
-        const response = await axios.post('/api/factures/store', formData.value);
-        console.log(response);
-    }
 
     onMounted(async () => {
         loadFromServer();

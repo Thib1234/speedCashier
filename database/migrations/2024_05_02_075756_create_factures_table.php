@@ -12,7 +12,9 @@ return new class extends Migration {
             $table->boolean('send')->default(0);
             $table->dateTime('date_facture');
             $table->unsignedBigInteger('sale_id')->nullable();
+            $table->unsignedBigInteger('client_id')->nullable();
             $table->foreign('sale_id')->references('id')->on('sales')->onDelete('set null');
+            $table->foreign('client_id')->references('id')->on('clients')->onDelete('set null');
             $table->timestamps();
         });
     }

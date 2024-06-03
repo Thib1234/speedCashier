@@ -1,5 +1,5 @@
 @extends('app')
 
 @section('content')
-<list></list>
+<list-invoices></list-invoices>
 @endsection
