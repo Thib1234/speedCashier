@@ -309,7 +309,7 @@ const loadFromServer = async () => {
         const response = await axios.get('/api/productsShow');
         products.value = response.data.products.data;
         categories.value = response.data.categories.data;
-        console.log("Products and Categories loaded", products.value, categories.value);
+        // console.log("Products and Categories loaded", products.value, categories.value);
     } catch (error) {
         console.error("Error loading data from server:", error);
     }
@@ -363,7 +363,7 @@ const updateFilteredClients = () => {
 };
 
 const addClient = (client) => {
-    console.log(client.id);
+    // console.log(client.id);
     client_id.value = client.id;
 };
 
@@ -410,7 +410,7 @@ const sendSaleData = async () => {
             resetCart();
             loadFromServer();
             sale_id.value = response.data.sale_id;
-            console.log("ID de la vente:", sale_id.value);
+            // console.log("ID de la vente:", sale_id.value);
             generateTicket(sale_id.value);
         })
         .catch(error => {
@@ -453,7 +453,7 @@ const createTicketAndPay = () => {
 const generateTicket = (saleId) => {
     axios.post("/api/pdf", saleId)
         .then(response => {
-            console.log(response);
+            // console.log(response);
         })
         .catch(error => {
             console.error("Erreur lors de la génération du ticket de caisse:", error);

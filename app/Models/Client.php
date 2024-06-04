@@ -13,6 +13,11 @@ class Client extends Model
     protected $fillable = [
         'name',
         'email',
+        'tva',
+        'company',
+        'adresse',
+        'code_postal',
+        'ville',
     ];
 
     public function sales(): HasMany

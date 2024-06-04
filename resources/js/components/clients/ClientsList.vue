@@ -4,7 +4,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div v-for="client in clients" :key="client.id" class="bg-white p-4 rounded-lg shadow-md">
                 <h2 class="text-xl font-bold mb-2">{{ client.name }}</h2>
-                <!-- Ajoutez d'autres informations sur le client si nécessaire -->
+                <h2 class="text-xl font-bold mb-2">{{ client.email }}</h2>
             </div>
         </div>
     </div>

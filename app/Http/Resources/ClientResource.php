@@ -17,6 +17,12 @@ class ClientResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'email' => $this->email,
+            'tva' => $this->tva,
+            'company' => $this->company,
+            'adresse' => $this->adresse,
+            'code_postal' => $this->code_postal,
+            'ville' => $this->ville,
         ];
     }
 }

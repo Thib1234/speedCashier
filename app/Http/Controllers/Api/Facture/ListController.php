@@ -11,7 +11,7 @@ class ListController extends Controller
 {
     public function __invoke(Request $request)
     {
-        $factures = Facture::with('client', 'sale')->get();
+        $factures = Facture::with('client', 'sale')->where('send', 0)->get();
         return response()->json([
             'factures' => $factures
         ]);

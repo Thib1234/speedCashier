@@ -350,7 +350,7 @@
         },
     ]
     const factures = [{
-            name: 'Créer un facture',
+            name: 'Créer une facture',
             description: 'Création d\'une nouvelle facture pour une vente',
             href: '/factures/create',
             icon: DocumentPlusIcon,

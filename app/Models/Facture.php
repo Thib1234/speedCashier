@@ -18,15 +18,12 @@ class Facture extends Model
     ];
 
     public function sale(): BelongsTo
-{
-    return $this->belongsTo(Sale::class);
-}
-
-
+    {
+        return $this->belongsTo(Sale::class);
+    }
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
     }
-
 
 }

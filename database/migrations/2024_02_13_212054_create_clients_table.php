@@ -15,6 +15,11 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('name');
+            $table->string('tva');
+            $table->string('company');
+            $table->string('adresse');
+            $table->smallInteger('code_postal');
+            $table->string('ville');
             $table->string('email');
         });
     }
