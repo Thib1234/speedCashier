@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id()->nullable();
             $table->string('name');
             $table->decimal('price', 8, 2);
+            $table->decimal('price_htva', 8, 2);
             $table->integer('stock')->nullable();
             $table->decimal('purchase_price', 8, 2)->nullable();
             $table->boolean('active')->default(true);

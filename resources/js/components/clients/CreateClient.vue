@@ -20,6 +20,36 @@
                                 autocomplete="given-name"
                                 class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                         </div>
+                        <label for="company" class="block text-sm font-medium leading-6 text-gray-900">Société</label>
+                        <div class="mt-2">
+                            <input v-model="formData.company" type="text" name="company" id="company"
+                                autocomplete="given-name"
+                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                        </div>
+                        <label for="tva" class="block text-sm font-medium leading-6 text-gray-900">TVA du client</label>
+                        <div class="mt-2">
+                            <input v-model="formData.tva" type="text" name="tva" id="tva"
+                                autocomplete="given-name"
+                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                        </div>
+                        <label for="adresse" class="block text-sm font-medium leading-6 text-gray-900">Adresse de la société</label>
+                        <div class="mt-2">
+                            <input v-model="formData.adresse" type="text" name="adresse" id="adresse"
+                                autocomplete="given-name"
+                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                        </div>
+                        <label for="code_postal" class="block text-sm font-medium leading-6 text-gray-900">Code postal de la société</label>
+                        <div class="mt-2">
+                            <input v-model="formData.code_postal" type="number" name="code_postal" id="code_postal"
+                                autocomplete="given-name"
+                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                        </div>
+                        <label for="ville" class="block text-sm font-medium leading-6 text-gray-900">Ville</label>
+                        <div class="mt-2">
+                            <input v-model="formData.ville" type="text" name="ville" id="ville"
+                                autocomplete="given-name"
+                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                        </div>
                     </div>
 
 
@@ -46,6 +76,11 @@ const errors = ref({});
 const formData = ref({
     name: '',
     email: '',
+    tva: '',
+    company: '',
+    adresse: '',
+    code_postal: '',
+    ville: '',
 })
 let success = ref(false);
 

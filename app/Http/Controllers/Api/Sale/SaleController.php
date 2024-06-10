@@ -55,6 +55,7 @@ class SaleController extends Controller
                 $productSale->quantity = $product['quantity'];
                 $productSale->price = $product['price'];
                 $productSale->total = $product['price'] * $product['quantity'];
+                $productSale->total_htva = round($productSale->total / (1 + (21/100)), 2);
                 $productSale->save();
             } else { // Si le produit n'est pas temporaire
                 $prod = Product::find($product['id']);
@@ -65,6 +66,7 @@ class SaleController extends Controller
                 $productSale->quantity = $product['quantity'];
                 $productSale->price = $product['price'];
                 $productSale->total = $product['price'] * $product['quantity'];
+                $productSale->total_htva = round($productSale->total / (1 + (21/100)), 2);
                 $productSale->save();
                 $prod->save();
             }

@@ -19,6 +19,7 @@ class ProductSale extends Model
         'quantity',
         'price',
         'total',
+        'total_htva',
     ];
 
     // Relation Many-to-One avec le modèle Sale

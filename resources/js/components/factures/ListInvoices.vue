@@ -30,16 +30,16 @@
         try {
             const response = await axios.get(url);
             factures.value = response.data.factures;
-            console.log(factures.value);
+            // console.log(factures.value);
         } catch (error) {
             console.error(error);
         }
     };
     const envoyerFactureParEmail = async (id) => {
-        console.log(id);
         const requestData = {
             id: id,
         }
+        console.log(requestData);
         await axios.post("/api/factures/send", requestData)
             .then(response => {
                 console.log(response);
@@ -47,6 +47,7 @@
             .catch(error => {
                 console.log(error);
             })
+            loadFromServer();
     }
     onMounted(async () => {
         loadFromServer();

@@ -8,42 +8,44 @@ use App\Models\Sale;
 use App\Models\Facture;
 use App\Models\Client;
 use Illuminate\Http\JsonResponse;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+
 
 class SendController extends Controller
 {
 	public function __invoke(Request $request): JsonResponse
-{
-    $validated = $request->validate([
-        'id' => 'required|integer',
-    ]);
+    {
+        $validated = $request->validate([
+            'id' => 'required|integer',
+        ]);
 
-    $facture = Facture::with('client', 'sale', 'sale.products')->findOrFail($validated['id']);
+        $facture = Facture::with('client', 'sale', 'sale.products')->findOrFail($validated['id']);
 
-    return response()->json([
-        'facture' => $facture,
-    ]);
+        // return response()->json([
+        //     'facture' => $facture,
+        // ]);
 
-    $client = Client::find($validated['client_id']);
-    $sale = Sale::find($validated['sale_id']);
+        $pdf = Pdf::loadview('factures.pdf.view', ['facture' => json_decode($facture, true)]);
+        $pdfData = [
+            'data' => $pdf->output(),
+            'name' => "facture-{$facture['id']}.pdf",
+        ];
 
-    if ($client && $sale) {
-        $facture = new Facture;
-        $facture->client_id = $client->id;
-        $facture->sale_id = $sale->id;
-        $facture->date_facture = now()->toDateString();
-        // Ajoutez ici d'autres champs si nécessaire
+        $client = $facture->client;
+
+        Mail::send('emails.facture', ['client' => $client], function($message) use ($client, $pdfData) {
+            $message->to($client->email)
+                    ->subject("Votre Facture")
+                    ->attachData($pdfData['data'], $pdfData['name']);
+        });
+
+        $facture->send = true;
         $facture->save();
-
         return response()->json([
             'success' => true,
-            'facture' => $facture,
-        ]);
-    } else {
-        return response()->json([
-            'success' => false,
-            'message' => 'Client ou vente non trouvé',
+            'factureId' => $facture,
         ]);
     }
-}
-
+    
 }
