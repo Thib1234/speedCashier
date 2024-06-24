@@ -24,7 +24,7 @@ class ClientFactory extends Factory
             'tva' => fake()->phoneNumber(),
             'company' => fake()->company(),
             'adresse' => fake()->address(),
-            'code_postal' => fake()->phoneNumber(),
+            'code_postal' => fake()->randomNumber(5, true),
             'ville' => fake()->city(),
         ];
     }

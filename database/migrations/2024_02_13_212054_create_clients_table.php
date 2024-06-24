@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('tva');
             $table->string('company');
             $table->string('adresse');
-            $table->smallInteger('code_postal');
+            $table->integer('code_postal');
             $table->string('ville');
             $table->string('email');
         });

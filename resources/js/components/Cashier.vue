@@ -322,7 +322,7 @@
     };
 
     const addTemporaryProduct = (name, price) => {
-        const tempProductId = "_" + Math.random().toString(36).substr(2, 9);
+        const tempProductId = "_" + Math.random().toString(36).substring(2, 9); // fonction en remplacement de substr()
         const tempProduct = {
             id: tempProductId,
             name,

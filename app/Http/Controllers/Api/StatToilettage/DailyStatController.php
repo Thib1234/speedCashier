@@ -93,21 +93,20 @@ class DailyStatController extends Controller
             return $salesByHour;
         }
     }
-    
-    
-        private function getSaleLines($sales)
-        {
-            return $sales->flatMap(function ($sale) {
-                return $sale->products->map(function ($product) use ($sale) {
-                    return [
-                        'id' => $sale->id,
-                        'product_id' => $product->id,
-                        'product_name' => $product->name,
-                        'quantity' => $product->pivot->quantity,
-                        'price' => $product->pivot->price,
-                    ];
-                });
-            })->values();
-        }
+
+    private function getSaleLines($sales)
+    {
+        return $sales->flatMap(function ($sale) {
+            return $sale->products->map(function ($product) use ($sale) {
+                return [
+                    'id' => $sale->id,
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'quantity' => $product->pivot->quantity,
+                    'price' => $product->pivot->price,
+                ];
+            });
+        })->values();
     }
+}
     
