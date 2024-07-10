@@ -200,6 +200,13 @@
     <div class="flex flex-col items-center">
         <h2 class="text-2xl font-bold mb-4">Moyens de paiement</h2>
         <div class="flex justify-between mb-4">
+            <button @click="selectpaymentMethod('bancontact')" :class="{
+                    'bg-blue-500': paymentMethod === 'bancontact',
+                    'bg-gray-400': paymentMethod !== 'bancontact',
+                }" class="flex items-center text-white py-3 px-6 rounded-lg mr-4 hover:bg-blue-600 focus:outline-none">
+                <span class="mr-2">Bancontact</span>
+                <CreditCardIcon class="h-6 w-6" />
+            </button>
             <!-- Paiement en espèces (cash) -->
             <button @click="selectpaymentMethod('cash')" :class="{
                     'bg-green-500': paymentMethod === 'cash',
@@ -208,13 +215,6 @@
                 class="flex items-center text-white py-3 px-6 rounded-lg mr-4 hover:bg-green-600 focus:outline-none">
                 <span class="mr-2">Cash</span>
                 <BanknotesIcon class="h-6 w-6" />
-            </button>
-            <button @click="selectpaymentMethod('bancontact')" :class="{
-                    'bg-blue-500': paymentMethod === 'bancontact',
-                    'bg-gray-400': paymentMethod !== 'bancontact',
-                }" class="flex items-center text-white py-3 px-6 rounded-lg mr-4 hover:bg-blue-600 focus:outline-none">
-                <span class="mr-2">Bancontact</span>
-                <CreditCardIcon class="h-6 w-6" />
             </button>
             <button @click="selectpaymentMethod('credit_card')" :class="{
                     'bg-purple-500': paymentMethod === 'credit_card',
@@ -230,15 +230,23 @@
                 <span class="mr-2">Virement</span>
                 <CreditCardIcon class="h-6 w-6" />
             </button>
-        </div>
-        <div v-if="paymentMethod === 'cash'" class="flex items-center mb-4">
-            <label for="amountPaidCash" class="mr-2">Montant payé:</label>
-            <input inputmode="numeric" id="amountPaidCash" type="number" v-model.number="amountPaidCash"
-                class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+            <button @click="selectpaymentMethod('stripe')" :class="{
+                    'bg-green-500': paymentMethod === 'stripe', 
+                    'bg-gray-400': paymentMethod !== 'stripe',
+                }"
+                class="flex items-center text-white py-3 px-6 ml-3 rounded-lg mr-4 hover:bg-green-600 focus:outline-none">
+                <span class="mr-2">Stripe</span>
+                <BanknotesIcon class="h-6 w-6" />
+            </button>
         </div>
         <div v-if="paymentMethod === 'bancontact'" class="flex items-center mb-4">
             <label for="amountPaidBancontact" class="mr-2">Montant payé:</label>
             <input inputmode="numeric" id="amountPaidBancontact" type="number" v-model.number="amountPaidBancontact"
+                class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+        </div>
+        <div v-if="paymentMethod === 'cash'" class="flex items-center mb-4">
+            <label for="amountPaidCash" class="mr-2">Montant payé:</label>
+            <input inputmode="numeric" id="amountPaidCash" type="number" v-model.number="amountPaidCash"
                 class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
         </div>
         <div v-if="paymentMethod === 'credit_card'" class="flex items-center mb-4">
@@ -249,6 +257,11 @@
         <div v-if="paymentMethod === 'virement'" class="flex items-center mb-4">
             <label for="amountPaidVirement" class="mr-2">Montant payé:</label>
             <input inputmode="numeric" id="amountPaidVirement" type="number" v-model.number="amountPaidVirement"
+                class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+        </div>
+        <div v-if="paymentMethod === 'stripe'" class="flex items-center mb-4">
+            <label for="amountPaidStripe" class="mr-2">Montant payé:</label>
+            <input inputmode="numeric" id="amountPaidStripe" type="number" v-model.number="amountPaidStripe"
                 class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
         </div>
         <span v-if="changeDue > 0" class="ml-4 text-blue-500">Montant à rendre: {{ changeDue }} €</span>
@@ -277,11 +290,12 @@
     const searchQuery = ref("");
     const searchQueryClient = ref("");
     const cart = ref([]);
-    const paymentMethod = ref("cash");
+    const paymentMethod = ref("bancontact");
     const amountPaidCash = ref(0);
     const amountPaidBancontact = ref(0);
     const amountPaidCreditcard = ref(0);
     const amountPaidVirement = ref(0);
+    const amountPaidStripe = ref(0);
     const showPopup = ref(false);
     const showPopUpTempProduct = ref(false);
     const filteredClients = ref([]);
@@ -322,7 +336,8 @@
     };
 
     const addTemporaryProduct = (name, price) => {
-        const tempProductId = "_" + Math.random().toString(36).substring(2, 9); // fonction en remplacement de substr()
+        const tempProductId = "_" + Math.random().toString(36).substring(2,
+            9); // fonction en remplacement de substr()
         const tempProduct = {
             id: tempProductId,
             name,
@@ -343,6 +358,8 @@
             amountPaidCreditcard.value = Math.abs(changeDue.value);
         } else if (paymentMethod.value === "virement") {
             amountPaidVirement.value = Math.abs(changeDue.value);
+        } else if (paymentMethod.value === "stripe") {
+            amountPaidStripe.value = Math.abs(changeDue.value);
         }
     };
 
@@ -352,17 +369,21 @@
 
     const changeDue = computed(() => {
         return amountPaidCash.value + amountPaidBancontact.value + amountPaidCreditcard.value +
-            amountPaidVirement.value - totalAmount.value;
+            amountPaidVirement.value + amountPaidStripe.value - totalAmount.value;
     });
 
     const selectpaymentMethod = (method) => {
         paymentMethod.value = method;
-        if (method === "cash") {
+        if (method === "bancontact") {
             payment_id.value = 1;
-        } else if (method === "bancontact") {
+        } else if (method === "cash") {
             payment_id.value = 2;
         } else if (method === "credit_card") {
             payment_id.value = 3;
+        } else if (method === "virement") {
+            payment_id.value = 4;
+        } else if (method === "stripe") {
+            payment_id.value = 5;
         }
     };
 
@@ -419,6 +440,7 @@
             bancontact: amountPaidBancontact.value,
             credit_card: amountPaidCreditcard.value,
             virement: amountPaidVirement.value,
+            stripe: amountPaidStripe.value,
         };
 
         await axios.post("/api/sales", requestData)
@@ -444,6 +466,7 @@
         amountPaidBancontact.value = 0;
         amountPaidCreditcard.value = 0;
         amountPaidVirement.value = 0;
+        amountPaidStripe.value = 0;
         client_id.value = null;
     };
 

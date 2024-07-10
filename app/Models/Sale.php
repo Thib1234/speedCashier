@@ -23,6 +23,7 @@ class Sale extends Model
         'bancontact',
         'credit_card',
         'virement',
+        'stripe',
         'total_amount',
         'client_id',
         'montant_total_htva',

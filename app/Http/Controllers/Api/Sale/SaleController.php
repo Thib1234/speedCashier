@@ -38,6 +38,7 @@ class SaleController extends Controller
         $sale->bancontact = $request->input('bancontact');
         $sale->credit_card = $request->input('credit_card');
         $sale->virement = $request->input('virement');
+        $sale->stripe = $request->input('stripe');
         $sale->montant_total_htva = round($request->input('total_amount') / (1 + (21/100)), 2);
         $sale->amount_tva = $request->input('total_amount') - $sale->montant_total_htva;
         $sale->save();
