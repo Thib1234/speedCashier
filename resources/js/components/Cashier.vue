@@ -148,15 +148,18 @@
                     <div class="text-lg">{{ item.product.price }} €</div>
                     <div class="flex items-center">
                         <button @click="removeFromCart(index)"
-                            class="text-red-500 font-bold focus:outline-none text-lg">
-                            -
-                        </button>
+                            class="text-red-500 font-bold focus:outline-none text-lg">-</button>
                         <div class="text-lg mx-3">{{ item.quantity }}</div>
                         <button @click="addToCart(item.product)"
-                            class="text-green-500 font-bold focus:outline-none text-lg">
-                            +
-                        </button>
+                            class="text-green-500 font-bold focus:outline-none text-lg">+</button>
                     </div>
+                    <div class="text-lg mx-3">
+                        <label for="discount-{{ index }}" class="mr-2">Remise (%):</label>
+                        <input v-model.number="item.discount" :id="'discount-' + index" type="number" step="0.01"
+                            class="w-20 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+                    </div>
+                    <div class="text-lg mx-3">Total:
+                        {{ item.product.price * (1 - item.discount / 100) * item.quantity }} €</div>
                 </div>
                 <div class="text-2xl font-bold text-right">
                     Total: {{ totalAmount }} €
@@ -231,7 +234,7 @@
                 <CreditCardIcon class="h-6 w-6" />
             </button>
             <button @click="selectpaymentMethod('stripe')" :class="{
-                    'bg-green-500': paymentMethod === 'stripe', 
+                    'bg-green-500': paymentMethod === 'stripe',
                     'bg-gray-400': paymentMethod !== 'stripe',
                 }"
                 class="flex items-center text-white py-3 px-6 ml-3 rounded-lg mr-4 hover:bg-green-600 focus:outline-none">
@@ -309,14 +312,11 @@
 
     const filteredProducts = computed(() => {
         if (currentCategoryId.value === null) {
-            return products.value.filter(product =>
-                product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-            );
+            return products.value.filter(product => product.name.toLowerCase().includes(searchQuery.value
+                .toLowerCase()));
         } else {
-            return products.value.filter(product =>
-                product.category_id === currentCategoryId.value &&
-                product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-            );
+            return products.value.filter(product => product.category_id === currentCategoryId.value && product
+                .name.toLowerCase().includes(searchQuery.value.toLowerCase()));
         }
     });
 
@@ -329,15 +329,13 @@
             const response = await axios.get('/api/productsShow');
             products.value = response.data.products.data;
             categories.value = response.data.categories.data;
-            // console.log("Products and Categories loaded", products.value, categories.value);
         } catch (error) {
             console.error("Error loading data from server:", error);
         }
     };
 
     const addTemporaryProduct = (name, price) => {
-        const tempProductId = "_" + Math.random().toString(36).substring(2,
-            9); // fonction en remplacement de substr()
+        const tempProductId = "_" + Math.random().toString(36).substring(2, 9);
         const tempProduct = {
             id: tempProductId,
             name,
@@ -364,7 +362,8 @@
     };
 
     const totalAmount = computed(() => {
-        return cart.value.reduce((total, item) => total + item.product.price * item.quantity, 0);
+        return cart.value.reduce((total, item) => total + item.product.price * (1 - item.discount / 100) * item
+            .quantity, 0);
     });
 
     const changeDue = computed(() => {
@@ -388,9 +387,8 @@
     };
 
     const updateFilteredClients = () => {
-        const filtered = Object.values(clients.value).filter(client =>
-            client.name.toLowerCase().includes(searchQueryClient.value.toLowerCase())
-        );
+        const filtered = Object.values(clients.value).filter(client => client.name.toLowerCase().includes(
+            searchQueryClient.value.toLowerCase()));
         filteredClients.value = filtered;
     };
 
@@ -409,7 +407,8 @@
                         ...product,
                         price: product.price
                     },
-                    quantity: 1
+                    quantity: 1,
+                    discount: 0 // Initial discount is 0%
                 });
             } else {
                 console.error("Le prix du produit est indéfini.");
@@ -432,6 +431,7 @@
                 id: item.product.id,
                 quantity: item.quantity,
                 price: item.product.price,
+                discount: item.discount,
                 name: item.product.name,
             })),
             client_id: client_id.value,
@@ -448,8 +448,6 @@
                 resetCart();
                 loadFromServer();
                 sale_id.value = response.data.sale_id;
-                // console.log("ID de la vente:", sale_id.value);
-                // generateTicket(sale_id.value);
             })
             .catch(error => {
                 console.error("Erreur lors de l'enregistrement de la vente:", error);
@@ -485,19 +483,8 @@
 
     const createTicketAndPay = () => {
         sendSaleData();
-        // generateTicket();
         showConfirmationModal.value = false;
     };
-
-    // const generateTicket = (saleId) => {
-    //     axios.post("/api/pdf", saleId)
-    //         .then(response => {
-    //             // console.log(response);
-    //         })
-    //         .catch(error => {
-    //             console.error("Erreur lors de la génération du ticket de caisse:", error);
-    //         });
-    // };
 
     const filterByCategory = (categoryId) => {
         currentCategoryId.value = categoryId === currentCategoryId.value ? null : categoryId;
