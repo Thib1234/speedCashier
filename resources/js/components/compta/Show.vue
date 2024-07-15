@@ -39,8 +39,8 @@ const props = defineProps({
   totalHtva: Number
 });
 
-const test = () => {
-  console.log(props);
-}
-test()
+// const test = () => {
+//   console.log(props);
+// }
+// test()
 </script>

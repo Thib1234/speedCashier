@@ -34,6 +34,8 @@ Route::view('/cashier', 'cashier')->name('cashier');
 Route::view('/test', 'cashier_test')->name('test');
 
 Route::get('/stats/print', [\App\Http\Controllers\Api\Compta\ShowStatsController::class, 'show'])->name('stats.show');
+Route::get('/stats-toilettage/print', [\App\Http\Controllers\Api\StatToilettage\ShowStatsController::class, 'show'])->name('stats-toilettage.show');
+
 
 Route::view('/factures/create', 'factures.create')->name('factures.create');
 Route::view('/factures/list', 'factures.list')->name('factures.list');
