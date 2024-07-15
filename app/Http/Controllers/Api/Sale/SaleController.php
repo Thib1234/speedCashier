@@ -29,7 +29,7 @@ class SaleController extends Controller
             'client_id' => 'nullable|exists:clients,id',
             'total_amount' => 'required|numeric|min:0',
         ]);
-        
+
         $sale = new Sale();
         $sale->datetime = now();
         $sale->client_id = $request->input('client_id');
@@ -42,7 +42,7 @@ class SaleController extends Controller
         $sale->montant_total_htva = round($request->input('total_amount') / (1 + (21/100)), 2);
         $sale->amount_tva = $request->input('total_amount') - $sale->montant_total_htva;
         $sale->save();
-    
+
         foreach ($request->input('products') as $product) {
             if (substr($product['id'], 0, 1) === '_') {
                 $tempProduct = new Product();
@@ -61,14 +61,30 @@ class SaleController extends Controller
             } else { // Si le produit n'est pas temporaire
                 $prod = Product::find($product['id']);
                 $prod->stock = $prod->stock - $product['quantity'];
-                $productSale = new ProductSale();
-                $productSale->sale_id = $sale->id;
-                $productSale->product_id = $product['id'];
-                $productSale->quantity = $product['quantity'];
-                $productSale->price = $product['price'];
-                $productSale->total = $product['price'] * $product['quantity'];
-                $productSale->total_htva = round($productSale->total / (1 + (21/100)), 2);
-                $productSale->save();
+
+                // Vérifier si le produit existe déjà dans la vente
+                $existingProductSale = ProductSale::where('sale_id', $sale->id)
+                    ->where('product_id', $product['id'])
+                    ->first();
+
+                if ($existingProductSale) {
+                    // Mettre à jour la quantité et le total si le produit existe déjà
+                    $existingProductSale->quantity += $product['quantity'];
+                    $existingProductSale->total += $product['price'] * $product['quantity'];
+                    $existingProductSale->total_htva = round($existingProductSale->total / (1 + (21/100)), 2);
+                    $existingProductSale->save();
+                } else {
+                    // Ajouter le produit à la vente s'il n'existe pas déjà
+                    $productSale = new ProductSale();
+                    $productSale->sale_id = $sale->id;
+                    $productSale->product_id = $product['id'];
+                    $productSale->quantity = $product['quantity'];
+                    $productSale->price = $product['price'];
+                    $productSale->total = $product['price'] * $product['quantity'];
+                    $productSale->total_htva = round($productSale->total / (1 + (21/100)), 2);
+                    $productSale->save();
+                }
+
                 $prod->save();
             }
         }

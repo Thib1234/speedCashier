@@ -38,6 +38,9 @@ Route::group(['middleware' =>['auth:sanctum']], function(){
     route::delete('sales/{saleId}', \App\Http\Controllers\Api\Sale\DeleteSaleController::class)->name('sales.delete');
     route::get('stats', \App\Http\Controllers\Api\Compta\StatsController::class)->name('compta.stats');
     route::get('stats-toilettage', \App\Http\Controllers\Api\StatToilettage\StatsController::class)->name('compta.stats-toilettage');
+    route::get('stats-products', \App\Http\Controllers\Api\StatProducts\StatsController::class)->name('compta.stats-products');
+    route::get('stats-nourriture', \App\Http\Controllers\Api\StatNourriture\StatsController::class)->name('compta.stats-nourriture');
+    route::get('stats-accessoires', \App\Http\Controllers\Api\StatAccessoires\StatsController::class)->name('compta.stats-accessoires');
 
     route::post('pdf', \App\Http\Controllers\Api\Pdf\TicketController::class)->name('ticket.create');// todo
 });

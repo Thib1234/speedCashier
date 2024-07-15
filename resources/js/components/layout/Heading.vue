@@ -335,6 +335,24 @@
             href: '/compta/stats-toilettage',
             icon: ChartBarIcon
         },
+        {
+            name: 'Stats produits toilettage avec période',
+            description: 'Affiche les stats générales des produits de toilettage sur une période déterminée',
+            href: '/compta/stats-products-toilettage',
+            icon: ChartBarIcon
+        },
+        {
+            name: 'Stats nourriture avec période',
+            description: 'Affiche les stats générales de la nourriture sur une période déterminée',
+            href: '/compta/stats-nourriture',
+            icon: ChartBarIcon
+        },
+        {
+            name: 'Stats accessoires avec période',
+            description: 'Affiche les stats générales des accessoires sur une période déterminée',
+            href: '/compta/stats-accessoires',
+            icon: ChartBarIcon
+        },
     ]
     const accounts = [{
             name: 'Liste',

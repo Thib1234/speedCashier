@@ -19,6 +19,9 @@ import Create from './components/factures/Create.vue'
 import List from './components/factures/List.vue'
 import ListInvoices from './components/factures/ListInvoices.vue'
 import StockList from './components/stock/StockView.vue'
+import StatsProducts from './components/compta/StatsProducts.vue';
+import StatsNourriture from './components/compta/StatsNourriture.vue';
+import StatsAccessoires from './components/compta/StatsAccessoires.vue';
 
 const app = createApp({});
 
@@ -41,6 +44,9 @@ app.component('List', List);
 app.component('Create', Create);
 app.component('StockList', StockList);
 app.component('ListInvoices', ListInvoices);
+app.component('StatsProducts', StatsProducts);
+app.component('StatsNourriture', StatsNourriture);
+app.component('StatsAccessoires', StatsAccessoires);
 
 
 app.mount('#app');
