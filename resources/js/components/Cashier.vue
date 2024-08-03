@@ -13,7 +13,7 @@
             <div class="grid grid-cols-6 justify-between w-full mx-1">
                 <button v-for="category in categories" :key="category.id" @click="filterByCategory(category.id)" :class="{
             'bg-gray-300 hover:bg-gray-400': currentCategoryId !== category.id,
-            'bg-red-400 hover:bg-gray-500': currentCategoryId === category.id
+            'bg-blue-400 hover:bg-blue-600': currentCategoryId === category.id
         }" class="text-gray-800 font-bold py-2 px-4 rounded m-1">
                     {{ category.name }}
                 </button>
@@ -36,7 +36,7 @@
                 </button>
             </div>
         </div>
-        <div class="w-full max-w-3xl mt-10">
+        <div class="w-full max-w-3xl mt-5">
             <div class="flex flex-col items-center">
                 <div>
                     <div class="flex">
@@ -137,7 +137,7 @@
                     </div>
                 </div>
             </div>
-            <h2 class="text-2xl font-bold mb-4 text-center">Panier</h2>
+            <h2 class="text-2xl font-bold my-4 text-center">Panier</h2>
             <div v-if="cart.length === 0" class="text-gray-500 text-center mb-4">
                 Le panier est vide.
             </div>
@@ -159,7 +159,7 @@
                             class="w-20 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
                     </div>
                     <div class="text-lg mx-3">Total:
-                        {{ item.product.price * (1 - item.discount / 100) * item.quantity }} €</div>
+                        {{ (item.product.price * (1 - item.discount / 100) * item.quantity).toFixed(2) }} €</div>
                 </div>
                 <div class="text-2xl font-bold text-right">
                     Total: {{ totalAmount }} €
@@ -272,6 +272,9 @@
         <span v-if="changeDue === 0" class="ml-4 text-green-500">Compte juste</span>
         <button @click="addtotal">{{ Math.abs(changeDue) }}</button>
     </div>
+    <div v-if="success" class="fixed top-5 right-5 bg-green-200 text-green-800 text-sm px-4 py-3 rounded">
+        Vente enregistrée
+    </div>
 </template>
 <script setup>
     import {
@@ -285,6 +288,7 @@
         CreditCardIcon
     } from "@heroicons/vue/24/outline";
 
+    const success = ref(false);
     const payment_id = ref(null);
     const products = ref([]);
     const categories = ref(null);
@@ -363,7 +367,7 @@
 
     const totalAmount = computed(() => {
         return cart.value.reduce((total, item) => total + item.product.price * (1 - item.discount / 100) * item
-            .quantity, 0);
+            .quantity, 0).toFixed(2);
     });
 
     const changeDue = computed(() => {
@@ -445,6 +449,10 @@
 
         await axios.post("/api/sales", requestData)
             .then(response => {
+                success.value = true;
+                setTimeout(() => {
+                    success.value = false;
+                }, 3000)
                 resetCart();
                 loadFromServer();
                 sale_id.value = response.data.sale_id;

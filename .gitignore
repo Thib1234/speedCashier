@@ -10,7 +10,7 @@
 .env.production
 .env prod
 .env copy.production
-.env.a.garder
+.env.a.garderbon
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -21,3 +21,5 @@ yarn-error.log
 /.idea
 /.vscode
 /database/seeders/UserSeeder.php
+.DS_Store
+**/.DS_Store

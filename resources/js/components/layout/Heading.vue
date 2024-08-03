@@ -1,10 +1,12 @@
 <template>
-    <header class="bg-white">
+    <header class="bg-white mt-1">
         <nav class="mx-auto flex max-w-2xl items-center justify-between p-1 lg:px-4" aria-label="Global">
             <div class="pr-10">
-                <a href="/cashier" class="-m-1.5 p-1.5">
-                    <h1>Speed Cashier</h1>
-                </a>
+                <h1 class="text-lg">
+                    <a href="/cashier">
+                        Speed Cashier
+                    </a>
+                </h1>
             </div>
             <div class="flex lg:hidden">
                 <button type="button"
@@ -226,7 +228,7 @@
                             <Disclosure as="div" class="-mx-3" v-slot="{ open }">
                                 <DisclosureButton
                                     class="flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
-                                    Product
+                                    Produits
                                     <ChevronDownIcon :class="[open ? 'rotate-180' : '', 'h-5 w-5 flex-none']"
                                         aria-hidden="true" />
                                 </DisclosureButton>
@@ -236,12 +238,71 @@
                                         {{ item.name }}</DisclosureButton>
                                 </DisclosurePanel>
                             </Disclosure>
-                            <a href="#"
-                                class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Features</a>
-                            <a href="#"
-                                class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Marketplace</a>
-                            <a href="#"
-                                class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Company</a>
+                            <Disclosure as="div" class="-mx-3" v-slot="{ open }">
+                                <DisclosureButton
+                                    class="flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-gray-900 hover:bg-green-50">
+                                    Clients
+                                    <ChevronDownIcon :class="[open ? 'rotate-180' : '', 'h-5 w-5 flex-none']"
+                                        aria-hidden="true" />
+                                </DisclosureButton>
+                                <DisclosurePanel class="mt-2 space-y-2">
+                                    <DisclosureButton v-for="item in clients" :key="item.name" as="a" :href="item.href"
+                                        class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                        {{ item.name }}</DisclosureButton>
+                                </DisclosurePanel>
+                            </Disclosure>
+                            <Disclosure as="div" class="-mx-3" v-slot="{ open }">
+                                <DisclosureButton
+                                    class="flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-gray-900 hover:bg-green-50">
+                                    Acomptes
+                                    <ChevronDownIcon :class="[open ? 'rotate-180' : '', 'h-5 w-5 flex-none']"
+                                        aria-hidden="true" />
+                                </DisclosureButton>
+                                <DisclosurePanel class="mt-2 space-y-2">
+                                    <DisclosureButton v-for="item in accounts" :key="item.name" as="a" :href="item.href"
+                                        class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                        {{ item.name }}</DisclosureButton>
+                                </DisclosurePanel>
+                            </Disclosure>
+                            <Disclosure as="div" class="-mx-3" v-slot="{ open }">
+                                <DisclosureButton
+                                    class="flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-gray-900 hover:bg-green-50">
+                                    Stats
+                                    <ChevronDownIcon :class="[open ? 'rotate-180' : '', 'h-5 w-5 flex-none']"
+                                        aria-hidden="true" />
+                                </DisclosureButton>
+                                <DisclosurePanel class="mt-2 space-y-2">
+                                    <DisclosureButton v-for="item in stats" :key="item.name" as="a" :href="item.href"
+                                        class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                        {{ item.name }}</DisclosureButton>
+                                </DisclosurePanel>
+                            </Disclosure>
+                            <Disclosure as="div" class="-mx-3" v-slot="{ open }">
+                                <DisclosureButton
+                                    class="flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-gray-900 hover:bg-green-50">
+                                    Stock
+                                    <ChevronDownIcon :class="[open ? 'rotate-180' : '', 'h-5 w-5 flex-none']"
+                                        aria-hidden="true" />
+                                </DisclosureButton>
+                                <DisclosurePanel class="mt-2 space-y-2">
+                                    <DisclosureButton v-for="item in stocks" :key="item.name" as="a" :href="item.href"
+                                        class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                        {{ item.name }}</DisclosureButton>
+                                </DisclosurePanel>
+                            </Disclosure>
+                            <Disclosure as="div" class="-mx-3" v-slot="{ open }">
+                                <DisclosureButton
+                                    class="flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-gray-900 hover:bg-green-50">
+                                    Factures
+                                    <ChevronDownIcon :class="[open ? 'rotate-180' : '', 'h-5 w-5 flex-none']"
+                                        aria-hidden="true" />
+                                </DisclosureButton>
+                                <DisclosurePanel class="mt-2 space-y-2">
+                                    <DisclosureButton v-for="item in factures" :key="item.name" as="a" :href="item.href"
+                                        class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                        {{ item.name }}</DisclosureButton>
+                                </DisclosurePanel>
+                            </Disclosure>
                         </div>
                         <div class="py-6">
                             <a href="#"

@@ -6,10 +6,10 @@
             <p class="w-1/3">Prix d'achat HTVA</p>
             <p class="w-1/3">Stock</p>
         </div>
-        <div v-for="product in products" :key="product.id" class="p-4 border-b border-gray-300 flex justify-between">
-            <h2 class="w-1/3 text-lg font-bold">{{ product.name }}</h2>
-            <p class="w-1/3 text-lg text-gray-700">{{ product.purchase_price }} €</p>
-            <p class="w-1/3 text-lg text-gray-700">{{ product.stock }}</p>
+        <div v-for="product in products" :key="product.id" class="p-4 border-b border-gray-300 flex justify-between text-sm">
+            <h2 class="w-1/3 font-bold">{{ product.name }}</h2>
+            <p class="w-1/3 text-gray-700">{{ product.purchase_price }} €</p>
+            <p class="w-1/3 text-gray-700">{{ product.stock }}</p>
         </div>
     </div>
 </template>
