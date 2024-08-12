@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->dateTime('datetime');
-            $table->decimal('cash', 8, 2)->nullable();; // Ajoutez une colonne pour le montant total
+            $table->decimal('cash', 8, 2)->nullable(); // Ajoutez une colonne pour le montant total
             $table->decimal('bancontact', 8, 2)->nullable(); // Ajoutez une colonne pour le montant total
             $table->decimal('credit_card', 8, 2)->nullable(); // Ajoutez une colonne pour le montant total
             $table->decimal('virement', 8, 2)->nullable(); // Ajoutez une colonne pour le montant total
             $table->decimal('stripe', 8, 2)->nullable(); // Ajoutez une colonne pour le montant total
+            $table->decimal('payconiq', 8, 2)->nullable(); // Ajoutez une colonne pour le montant total
             $table->decimal('total_amount', 8, 2); // Ajoutez une colonne pour le montant total
             $table->decimal('montant_total_htva', 8, 2);
             $table->decimal('amount_tva', 6, 2);

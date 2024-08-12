@@ -241,6 +241,14 @@
                 <span class="mr-2">Stripe</span>
                 <BanknotesIcon class="h-6 w-6" />
             </button>
+            <button @click="selectpaymentMethod('payconiq')" :class="{
+                    'bg-green-500': paymentMethod === 'payconiq',
+                    'bg-gray-400': paymentMethod !== 'payconiq',
+                }"
+                class="flex items-center text-white py-3 px-6 ml-3 rounded-lg mr-4 hover:bg-green-600 focus:outline-none">
+                <span class="mr-2">Payconiq</span>
+                <BanknotesIcon class="h-6 w-6" />
+            </button>
         </div>
         <div v-if="paymentMethod === 'bancontact'" class="flex items-center mb-4">
             <label for="amountPaidBancontact" class="mr-2">Montant payé:</label>
@@ -265,6 +273,11 @@
         <div v-if="paymentMethod === 'stripe'" class="flex items-center mb-4">
             <label for="amountPaidStripe" class="mr-2">Montant payé:</label>
             <input inputmode="numeric" id="amountPaidStripe" type="number" v-model.number="amountPaidStripe"
+                class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
+        </div>
+        <div v-if="paymentMethod === 'payconiq'" class="flex items-center mb-4">
+            <label for="amountPaidPayconiq" class="mr-2">Montant payé:</label>
+            <input inputmode="numeric" id="amountPaidPayconiq" type="number" v-model.number="amountPaidPayconiq"
                 class="w-32 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-lg" />
         </div>
         <span v-if="changeDue > 0" class="ml-4 text-blue-500">Montant à rendre: {{ changeDue }} €</span>
@@ -303,6 +316,7 @@
     const amountPaidCreditcard = ref(0);
     const amountPaidVirement = ref(0);
     const amountPaidStripe = ref(0);
+    const amountPaidPayconiq = ref(0);
     const showPopup = ref(false);
     const showPopUpTempProduct = ref(false);
     const filteredClients = ref([]);
@@ -362,6 +376,8 @@
             amountPaidVirement.value = Math.abs(changeDue.value);
         } else if (paymentMethod.value === "stripe") {
             amountPaidStripe.value = Math.abs(changeDue.value);
+        } else if (paymentMethod.value === "payconiq") {
+            amountPaidPayconiq.value = Math.abs(changeDue.value);
         }
     };
 
@@ -371,8 +387,8 @@
     });
 
     const changeDue = computed(() => {
-        return amountPaidCash.value + amountPaidBancontact.value + amountPaidCreditcard.value +
-            amountPaidVirement.value + amountPaidStripe.value - totalAmount.value;
+        return (amountPaidCash.value + amountPaidBancontact.value + amountPaidCreditcard.value +
+            amountPaidVirement.value + amountPaidStripe.value + amountPaidPayconiq.value) - totalAmount.value;
     });
 
     const selectpaymentMethod = (method) => {
@@ -387,6 +403,8 @@
             payment_id.value = 4;
         } else if (method === "stripe") {
             payment_id.value = 5;
+        } else if (method === "payconiq") {
+            payment_id.value = 6;
         }
     };
 
@@ -445,6 +463,7 @@
             credit_card: amountPaidCreditcard.value,
             virement: amountPaidVirement.value,
             stripe: amountPaidStripe.value,
+            payconiq: amountPaidPayconiq.value,
         };
 
         await axios.post("/api/sales", requestData)
@@ -473,6 +492,7 @@
         amountPaidCreditcard.value = 0;
         amountPaidVirement.value = 0;
         amountPaidStripe.value = 0;
+        amountPaidPayconiq.value = 0;
         client_id.value = null;
     };
 

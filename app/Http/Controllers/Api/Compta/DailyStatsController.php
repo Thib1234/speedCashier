@@ -21,30 +21,26 @@ class DailyStatsController extends Controller
     { 
         // Récupérer la date d'aujourd'hui
         $today = now()->format('Y-m-d');
-        // $sales = Sale::whereDate('created_at', $today)->get();
 
         $sales = Sale::whereDate('created_at', $today)->with('products', 'client')->get();
-         //dd($sale);
-        // Nombre total de ventes du jour
+
         $totalSales = $sales->count();
         
         $totalAmount = $sales->sum('total_amount');
 
-        // Nombre total de clients pour aujourd'hui
         $totalClients = Client::whereHas('sales', function ($query) use ($today) {
             $query->whereDate('created_at', $today);
         })->count();
 
         $startDate = (new DateTime('today 06:00:00'))->format('Y-m-d H:00:00');
-        ; // Début de la période à 7h00 aujourd'hui
-        $endDate = (new DateTime('today 20:00:00'))->format('Y-m-d H:00:00'); // Fin de la période à 20h00 aujourd'hui
+        $endDate = (new DateTime('today 20:00:00'))->format('Y-m-d H:00:00');
         
-        $salesByHour = []; // Initialise un tableau pour stocker les ventes par heure
+        $salesByHour = [];
 
         foreach ($sales as $sale) {
             $saleDate = new DateTime($sale->created_at);
             if ($saleDate >= new DateTime($startDate) && $saleDate <= new DateTime($endDate)) {
-                $hour = $saleDate->format('H'); // Obtenir uniquement l'heure
+                $hour = $saleDate->format('H');
                 if (!isset($salesByHour[$hour])) {
                     $salesByHour[$hour] = 0;
                 }
@@ -52,13 +48,9 @@ class DailyStatsController extends Controller
             }
         }
 
-        // Trier le tableau par heure
         ksort($salesByHour);
 
         $labels = array_keys($salesByHour);
-
-        
-        // Remplir les heures sans ventes avec un total de 0
         $period = new DatePeriod(
             new DateTime($startDate),
             new DateInterval('PT1H'), // Interval de 1 heure
@@ -68,28 +60,22 @@ class DailyStatsController extends Controller
         $saleLines = [];
         foreach ($sales as $sale) {
             $product = Product::find($sale->product_id);
-        
-            // Vérifiez si le produit existe avant d'essayer d'accéder à ses propriétés
             if ($product) {
                 $saleLine = [
                     'id' => $sale->id,
                     'product_id' => $sale->product_id,
-                    'product_name' => $product->name, // Ajout du nom du produit
+                    'product_name' => $product->name,
                     'quantity' => $sale->quantity,
                     'price' => $sale->price,
-                    // Ajoutez d'autres champs pertinents au besoin
                 ];
                 $saleLines[] = $saleLine;
             } else {
-                // Gérer le cas où le produit n'existe pas
-                // Vous pouvez par exemple assigner un nom générique ou laisser vide
                 $saleLine = [
                     'id' => $sale->id,
                     'product_id' => $sale->product_id,
                     'product_name' => 'Produit inconnu',
                     'quantity' => $sale->quantity,
                     'price' => $sale->price,
-                    // Ajoutez d'autres champs pertinents au besoin
                 ];
                 $saleLines[] = $saleLine;
             }
@@ -97,7 +83,6 @@ class DailyStatsController extends Controller
             return response()->json([
                 'total_sales' => $totalSales,
                 'total_clients' => $totalClients,
-                // 'total_payments' => $totalPayments,
                 'sale_lines' => $saleLines,
                 'sales' => $sales,
                 'totalAmount' => $totalAmount,

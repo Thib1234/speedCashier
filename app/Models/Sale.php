@@ -24,6 +24,7 @@ class Sale extends Model
         'credit_card',
         'virement',
         'stripe',
+        'payconiq',
         'total_amount',
         'client_id',
         'montant_total_htva',

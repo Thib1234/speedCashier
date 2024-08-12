@@ -56,6 +56,10 @@
                             <span class="font-medium">Stripe:</span>
                             <span>{{ sale.stripe }}€</span>
                         </div>
+                        <div v-if="sale.payconiq" class="flex items-center space-x-2">
+                            <span class="font-medium">Payconiq:</span>
+                            <span>{{ sale.payconiq }}€</span>
+                        </div>
                     </div>
                     <button @click="deleteSale(sale.id)"
                         class="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Supprimer

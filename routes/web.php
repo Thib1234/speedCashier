@@ -28,7 +28,7 @@ Route::get('/generate-pdf', [PDFController::class, 'generatePDF']);
 Route::view('/account', 'acompte.show')->name('acompte.show');
 Route::view('/account/create', 'acompte.create')->name('acompte.create');
 
-Route::get('/register', [RegisterController::class, 'create']);
+// Route::get('/register', [RegisterController::class, 'create']);
 
 Route::post('/login', [LoginController::class, 'doLogin'])->name('auth.doLogin');
 Route::delete('/logout', [LoginController::class, 'logout'])->name('auth.logout');

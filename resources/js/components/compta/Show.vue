@@ -11,12 +11,13 @@
             <div>Qté: {{ product.pivot.quantity }}</div>
           </div>
           <div class="bg-gray-100 p-2 rounded">
-            <div class="grid grid-cols-5 gap-2 text-xs font-medium">
+            <div class="grid grid-cols-6 gap-2 text-xs font-medium">
               <div>Cash: {{ stat.cash }} €</div>
               <div>Bancontact: {{ stat.bancontact }} €</div>
               <div>Carte de crédit: {{ stat.credit_card }} €</div>
               <div>Virement: {{ stat.virement }} €</div>
               <div>Stripe: {{ stat.stripe }} €</div>
+              <div>Payconiq: {{ stat.payconiq }} €</div>
             </div>
           </div>
         </div>
@@ -40,8 +41,4 @@ const props = defineProps({
   totalHtva: Number
 });
 
-// const test = () => {
-//   console.log(props);
-// }
-// test()
 </script>

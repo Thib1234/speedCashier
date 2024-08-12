@@ -12,13 +12,6 @@
         <div v-else>
             <canvas ref="salesChartCanvas" width="400" height="200"></canvas>
         </div>
-        <!-- <a :href="`/stats/print`" class="flex-grow">
-            <button
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:-translate-y-1">
-                Imprimer statistiques
-            </button>
-        </a> -->
-
         <div v-if="total_sales">
             <a :href="`/stats/print?start=${startDate}&end=${endDate}`" class="flex-grow">
                 <button
@@ -42,7 +35,6 @@
             <button @click="deleteSale(sale.id)"
                 class="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-sm">Supprimer</button>
         </div>
-
     </div>
 </template>
 

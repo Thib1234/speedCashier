@@ -62,7 +62,7 @@
 
     const fetchStats = async () => {
         if (!startDate.value || !endDate.value) {
-            return; // Ne rien faire si les dates ne sont pas renseignées
+            return;
         }
         try {
             const response = await axios.get('/api/stats-accessoires', {
